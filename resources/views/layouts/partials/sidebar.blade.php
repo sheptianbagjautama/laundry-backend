@@ -43,7 +43,7 @@
           </li>
           <li class="nav-header">DATA MASTER</li>
           <li class="nav-item">
-            <a href="pages/gallery.html" class="nav-link">
+            <a href="{{ route('groups.index') }}" class="nav-link">
               <i class="nav-icon fa fa-book"></i>
               <p>
                 Grup
@@ -102,12 +102,17 @@
           
           <li class="nav-header">PENGATURAN</li>
           <li class="nav-item">
-            <a href="pages/gallery.html" class="nav-link">
-              <i class="nav-icon far fa-image"></i>
+            <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault();
+            document.getElementById('logout-form').submit();">
+              <i class="nav-icon fa fa-plug"></i>
               <p>
                 Keluar
               </p>
             </a>
+
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+          </form>
           </li>
         </ul>
       </nav>
