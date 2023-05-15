@@ -11,7 +11,9 @@
  <!-- JQVMap -->
  {{-- <link rel="stylesheet" href="{{ asset('lte/plugins/jqvmap/jqvmap.min.css')}} "> --}}
  <!-- Theme style -->
+
  <link rel="stylesheet" href="{{ asset('lte/dist/css/adminlte.min.css') }} ">
+
  <!-- overlayScrollbars -->
  {{-- <link rel="stylesheet" href="{{ asset('lte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css')}} "> --}}
  <!-- Daterange picker -->

@@ -15,7 +15,6 @@ class GroupController extends Controller
      */
     public function index(Request $request)
     {
-        $groups = Group::all();
         $title = 'Grup';
         $subtitle = 'Halaman Grup';
         return view('moduls.group.index', [
@@ -23,7 +22,24 @@ class GroupController extends Controller
             'subtitle' => $subtitle
         ]);
     }
-    // }
+
+    public function getGroups(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Group::latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
+
+                    $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
+
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -44,13 +60,16 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required'
-        ]);
+        Group::updateOrCreate(
+            [
+                'id' => $request->group_id
+            ],
+            [
+                'name' => $request->name
+            ]
+        );
 
-        Group::create($request->all());
-
-        return redirect()->route('groups.index')->with('success', 'Berhasil menyimpan grup');
+        return response()->json(['success' => 'Berhasil menyimpan grup']);
     }
 
     /**
@@ -64,32 +83,34 @@ class GroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Group $group): View
+    public function edit($id)
     {
-        return view('moduls.group.edit', compact('group'));
+        // return view('moduls.group.edit', compact('group'));
+        $group = Group::find($id);
+        return response()->json($group);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Group $group): RedirectResponse
+    public function update(Request $request, Group $group)
     {
-        $request->validate([
-            'name' => 'required'
-        ]);
+        // $request->validate([
+        //     'name' => 'required'
+        // ]);
 
-        $group->update($request->all());
+        // $group->update($request->all());
 
-        return redirect()->route('groups.index')->with('success', 'Berhasil mengubah grup');
+        // return redirect()->route('groups.index')->with('success', 'Berhasil mengubah grup');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Group $group): RedirectResponse
+    public function destroy($id)
     {
-        $group->delete();
+        Group::find($id)->delete();
 
-        return redirect()->route('groups.index')->with('success', 'Berhasil menghapus grup');
+        return response()->json(['success' => 'Berhasil menghapus grup']);
     }
 }

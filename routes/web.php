@@ -55,7 +55,9 @@ Route::middleware(['auth', 'user-access:manager'])->group(function () {
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('groups', GroupController::class);
+    Route::get('groups/list', [GroupController::class, 'getGroups'])->name('groups.list');
+    Route::get('groups', [GroupController::class, 'index'])->name('groups.index');
+    Route::post('groups', [GroupController::class, 'store'])->name('groups.store');
+    Route::get('groups/{id}/edit', [GroupController::class, 'edit'])->name('groups.edit');
+    Route::delete('groups/{id}', [GroupController::class, 'destroy'])->name('groups.destroy');
 });
-
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
