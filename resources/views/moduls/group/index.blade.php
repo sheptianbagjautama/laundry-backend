@@ -1,14 +1,12 @@
 @extends('layouts.main')
 
 @section('links')
-    {{-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" /> --}}
-    {{-- <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet"> --}}
-    {{-- <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" rel="stylesheet"> --}}
-
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('lte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('lte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('lte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="{{ asset('lte/plugins/sweetalert/sweetalert2.min.css') }}">
 @endsection
 
 @section('content')
@@ -21,12 +19,12 @@
                     <div class="col-sm-6">
                         <h1>{{ $title }}</h1>
                     </div>
-                    <div class="col-sm-6">
+                    {{-- <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">Home</a></li>
                             <li class="breadcrumb-item active">Blank Page</li>
                         </ol>
-                    </div>
+                    </div> --}}
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -37,7 +35,7 @@
             <!-- Default box -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Title</h3>
+                    <h3 class="card-title">Data Grup</h3>
 
                     <div class="card-tools">
                         <a class="btn btn-secondary" href="javascript:void(0)" id="createNewGroup">
@@ -95,7 +93,7 @@
 
                             </div>
                             <div class="modal-footer justify-content-between">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Kembali</button>
                                 <button type="submit" id="saveBtn" class="btn btn-success" value="create">Simpan</button>
                             </div>
                         </form>
@@ -113,12 +111,6 @@
 @endsection
 
 @section('scripts')
-    {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script> --}}
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script> --}}
-    {{-- <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script> --}}
-    {{-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script> --}}
-    {{-- <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script> --}}
-
     <!-- DataTables  & Plugins -->
     <script src="{{ asset('lte/plugins/datatables/jquery.dataTables.min.js') }} "></script>
     <script src="{{ asset('lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }} "></script>
@@ -132,8 +124,24 @@
     <script src="{{ asset('lte/plugins/datatables-buttons/js/buttons.html5.min.js') }} "></script>
     <script src="{{ asset('lte/plugins/datatables-buttons/js/buttons.print.min.js') }} "></script>
     <script src="{{ asset('lte/plugins/datatables-buttons/js/buttons.colVis.min.js') }} "></script>
+
+    <!-- SweetAlert2 -->
+    <script src="{{ asset('lte/plugins/sweetalert/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
         $(function() {
+
+            // const Toast = Swal.mixin({
+            //     toast: true,
+            //     position: 'top-end',
+            //     showConfirmButton: false,
+            //     timer: 3000,
+            //     timerProgressBar: true,
+            //     didOpen: (toast) => {
+            //         toast.addEventListener('mouseenter', Swal.stopTimer)
+            //         toast.addEventListener('mouseleave', Swal.resumeTimer)
+            //     }
+            // })
+
 
             $.ajaxSetup({
                 headers: {
@@ -151,11 +159,11 @@
                     },
                     {
                         data: 'name',
-                        name: 'name'
+                        name: 'Nama'
                     },
                     {
                         data: 'action',
-                        name: 'action',
+                        name: 'Aksi',
                         orderable: true,
                         searchable: true
                     },
@@ -169,10 +177,11 @@
                 --------------------------------------------
                 --------------------------------------------*/
             $('#createNewGroup').click(function() {
+                // $(this).html('Simpan');
                 $('#saveBtn').val("create-group");
                 $('#group_id').val("");
-                $('#groupForm').trigger("reset");
                 $('#modealHeading').html("Membuat Grup Baru");
+                $('#groupForm').trigger("reset");
                 $('#ajaxModel').modal("show");
 
             })
@@ -185,8 +194,9 @@
             $('body').on('click', '.editProduct', function() {
                 var group_id = $(this).data('id');
                 console.log('product id => ', group_id)
+                // $(this).html('Ubah');
                 $.get("{{ route('groups.index') }}" + '/' + group_id + '/edit', function(data) {
-                    $('#modelHeading').html("Ubah Grup");
+                    $('#modealHeading').html("Mengubah Grup");
                     $('#saveBtn').val("edit-group");
                     $('#ajaxModel').modal('show');
                     $('#group_id').val(data.id);
@@ -198,12 +208,12 @@
 
             /*------------------------------------------
                 --------------------------------------------
-                Create Product Code
+                Create Code
                 --------------------------------------------
                 --------------------------------------------*/
             $('#saveBtn').click(function(e) {
                 e.preventDefault();
-                $(this).html('Mengirim..');
+                // $(this).html('Mengirim..');
 
                 console.log($('#groupForm').serialize());
 
@@ -215,6 +225,28 @@
                     success: function(data) {
                         $('#groupForm').trigger("reset");
                         $('#ajaxModel').modal('hide');
+
+
+                        let isCreate = $('#groupForm').serialize();
+                        console.log("isCreate : ", isCreate)
+
+                        if (isCreate.includes('group_id=&')) {
+                            console.log('create')
+                            Swal.fire(
+                                'Sukses!',
+                                'Berhasil menyimpan grup',
+                                'success'
+                            )
+                        } else {
+                            Swal.fire(
+                                'Sukses!',
+                                'Berhasil mengubah grup',
+                                'success'
+                            )
+                        }
+
+
+
                         table.draw();
                     },
                     error: function(data) {
@@ -227,23 +259,43 @@
 
             /*------------------------------------------
                 --------------------------------------------
-                Delete Product Code
+                Delete Code
                 --------------------------------------------
                 --------------------------------------------*/
             $('body').on('click', '.deleteProduct', function() {
-                var group_id = $(this).data("id");
-                confirm("Are You sure want to delete !");
 
-                $.ajax({
-                    type: "DELETE",
-                    url: "{{ route('groups.store') }}" + '/' + group_id,
-                    success: function(data) {
-                        table.draw();
-                    },
-                    error: function(data) {
-                        console.log('Error: ', data);
+                Swal.fire({
+                    title: 'Anda yakin ?',
+                    text: 'Data grup ini akan dihapus jika menekan tombol hapus',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Kembali',
+                    confirmButtonText: 'Hapus',
+                    confirmButtonColor: "#dc3545",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        var group_id = $(this).data("id");
+
+                        $.ajax({
+                            type: "DELETE",
+                            url: "{{ route('groups.store') }}" + '/' + group_id,
+                            success: function(data) {
+                                Swal.fire(
+                                    'Sukses!',
+                                    'Berhasil menghapus grup',
+                                    'success'
+                                )
+                                table.draw();
+                            },
+                            error: function(data) {
+                                console.log('Error: ', data);
+                            }
+                        })
                     }
                 })
+
+
             })
 
 
