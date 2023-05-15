@@ -19,12 +19,6 @@
                     <div class="col-sm-6">
                         <h1>{{ $title }}</h1>
                     </div>
-                    {{-- <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
-                            <li class="breadcrumb-item active">Blank Page</li>
-                        </ol>
-                    </div> --}}
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -44,14 +38,6 @@
                     </div>
                 </div>
                 <div class="card-body">
-
-                    @if ($message = Session::get('success'))
-                        <div class="alert alert-success alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                            <h5><i class="icon fas fa-check"></i> Berhasil!</h5>
-                            {{ $message }}
-                        </div>
-                    @endif
 
                     <table class="table table-bordered table-hover yajra-datatable">
                         <thead>
@@ -111,6 +97,8 @@
 @endsection
 
 @section('scripts')
+    <!-- SweetAlert2 -->
+    <script src="{{ asset('lte/plugins/sweetalert/sweetalert2.all.min.js') }}"></script>
     <!-- DataTables  & Plugins -->
     <script src="{{ asset('lte/plugins/datatables/jquery.dataTables.min.js') }} "></script>
     <script src="{{ asset('lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }} "></script>
@@ -125,22 +113,9 @@
     <script src="{{ asset('lte/plugins/datatables-buttons/js/buttons.print.min.js') }} "></script>
     <script src="{{ asset('lte/plugins/datatables-buttons/js/buttons.colVis.min.js') }} "></script>
 
-    <!-- SweetAlert2 -->
-    <script src="{{ asset('lte/plugins/sweetalert/sweetalert2.all.min.js') }}"></script>
+
     <script type="text/javascript">
         $(function() {
-
-            // const Toast = Swal.mixin({
-            //     toast: true,
-            //     position: 'top-end',
-            //     showConfirmButton: false,
-            //     timer: 3000,
-            //     timerProgressBar: true,
-            //     didOpen: (toast) => {
-            //         toast.addEventListener('mouseenter', Swal.stopTimer)
-            //         toast.addEventListener('mouseleave', Swal.resumeTimer)
-            //     }
-            // })
 
 
             $.ajaxSetup({
@@ -159,11 +134,11 @@
                     },
                     {
                         data: 'name',
-                        name: 'Nama'
+                        name: 'name'
                     },
                     {
                         data: 'action',
-                        name: 'Aksi',
+                        name: 'action',
                         orderable: true,
                         searchable: true
                     },
