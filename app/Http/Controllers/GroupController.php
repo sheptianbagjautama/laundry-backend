@@ -13,7 +13,7 @@ class GroupController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
         $title = 'Grup';
         $subtitle = 'Halaman Grup';

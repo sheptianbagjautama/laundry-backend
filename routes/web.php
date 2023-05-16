@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TypeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -60,4 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('groups', [GroupController::class, 'store'])->name('groups.store');
     Route::get('groups/{id}/edit', [GroupController::class, 'edit'])->name('groups.edit');
     Route::delete('groups/{id}', [GroupController::class, 'destroy'])->name('groups.destroy');
+
+    Route::get('types/list', [TypeController::class, 'getTypes'])->name('types.list');
+    Route::resource('types', TypeController::class);
 });
