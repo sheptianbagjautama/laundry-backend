@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
+use function PHPUnit\Framework\isEmpty;
+
 class ProductController extends Controller
 {
     public function getProducts(Request $request)
@@ -50,8 +52,46 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $group_products = $request->group_product;
+
+        if (count($group_products) < 1) {
+            return response()->json([
+                'isError' => true,
+                'data' => $request->all(),
+                'message' => 'Barang minimal mempunyai 1 detail jenis corak, silahkan isi terlebih dahulu.'
+            ]);
+        }
+
+        foreach ($group_products as $key => $gp) {
+            if ($gp['group_id'] == 0) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada jenis corak yang masih kosong, silahkan isi terlebih dahulu.'
+                ]);
+            }
+
+            if ($gp['qty'] == null) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada kuantitas yang masih kosong, silahkan isi terlebih dahulu.'
+                ]);
+            }
+
+            if ($gp['price'] == null) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada harga yang masih kosong, silahkan isi terlebih dahulu.'
+                ]);
+            }
+        }
+
         return response()->json([
-            'data' => $request->all()
+            'isError' => false,
+            'data' => $request->all(),
+            'message' => 'berhasil'
         ]);
     }
 

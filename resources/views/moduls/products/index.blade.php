@@ -349,31 +349,39 @@
                         dataType: "json",
                         success: function(data) {
                             console.log('data => ', data);
-                            $('#productForm').trigger("reset");
-                            $('#ajaxModel').modal('hide');
+
+                            if (data.isError == false) {
+                                $('#productForm').trigger("reset");
+                                $('#ajaxModel').modal('hide');
+
+                                let isCreate = $('#productForm').serialize();
+                                console.log("isCreate : ", isCreate)
+
+                                if (isCreate.includes('product_id=&')) {
+                                    console.log('create')
+                                    Swal.fire(
+                                        'Sukses!',
+                                        'Berhasil menyimpan barang',
+                                        'success'
+                                    )
+                                } else {
+                                    Swal.fire(
+                                        'Sukses!',
+                                        'Berhasil mengubah barang',
+                                        'success'
+                                    )
+                                }
 
 
-                            let isCreate = $('#productForm').serialize();
-                            console.log("isCreate : ", isCreate)
-
-                            if (isCreate.includes('product_id=&')) {
-                                console.log('create')
-                                Swal.fire(
-                                    'Sukses!',
-                                    'Berhasil menyimpan barang',
-                                    'success'
-                                )
+                                // table.draw();
                             } else {
                                 Swal.fire(
-                                    'Sukses!',
-                                    'Berhasil mengubah barang',
-                                    'success'
+                                    'Gagal!',
+                                    data.message,
+                                    'error'
                                 )
                             }
 
-
-
-                            // table.draw();
                         },
                         error: function(data) {
                             console.log('Error: ', data);
