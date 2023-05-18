@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TypeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -61,7 +62,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('groups', [GroupController::class, 'store'])->name('groups.store');
     Route::get('groups/{id}/edit', [GroupController::class, 'edit'])->name('groups.edit');
     Route::delete('groups/{id}', [GroupController::class, 'destroy'])->name('groups.destroy');
+    Route::post('getSearchGroups', [GroupController::class, 'getSearchGroups'])->name('groups.select');
 
     Route::get('types/list', [TypeController::class, 'getTypes'])->name('types.list');
     Route::resource('types', TypeController::class);
+    Route::post('getSearchTypes', [TypeController::class, 'getSearchTypes'])->name('types.select');
+
+    Route::get('products/list', [ProductController::class, 'getProducts'])->name('products.list');
+    Route::resource('products', ProductController::class);
 });
