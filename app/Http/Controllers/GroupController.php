@@ -113,4 +113,25 @@ class GroupController extends Controller
 
         return response()->json(['success' => 'Berhasil menghapus grup']);
     }
+
+
+    public function getSearchGroups(Request $request)
+    {
+        $search = $request->search;
+
+        if ($search == '') {
+            $groups = Group::orderby('name', 'asc')->select('id', 'name')->limit(5)->get();
+        } else {
+            $groups = Group::orderby('name', 'asc')->select('id', 'name')->where('name', 'like', '%' . $search . '%')->limit(5)->get();
+        }
+
+        $response = array();
+        foreach ($groups as $group) {
+            $response[] = array(
+                "id" => $group->id,
+                "text" => $group->name
+            );
+        }
+        return response()->json($response);
+    }
 }
