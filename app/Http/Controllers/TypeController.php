@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Http\JsonResponse;
 
 class TypeController extends Controller
 {
@@ -98,5 +99,25 @@ class TypeController extends Controller
         Type::find($id)->delete();
 
         return response()->json(['success' => 'Berhasil menghapus tipe']);
+    }
+
+    public function getSearchTypes(Request $request)
+    {
+        $search = $request->search;
+
+        if ($search == '') {
+            $types = Type::orderby('name', 'asc')->select('id', 'name')->limit(5)->get();
+        } else {
+            $types = Type::orderby('name', 'asc')->select('id', 'name')->where('name', 'like', '%' . $search . '%')->limit(5)->get();
+        }
+
+        $response = array();
+        foreach ($types as $type) {
+            $response[] = array(
+                "id" => $type->id,
+                "text" => $type->name
+            );
+        }
+        return response()->json($response);
     }
 }
