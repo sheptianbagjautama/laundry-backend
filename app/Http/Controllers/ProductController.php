@@ -194,6 +194,14 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Product::with(['type', 'groups'])->findOrFail($id);
+
+        $product->groups()->detach();
+        $product->delete();
+
+        return response()->json([
+            'isError' => false,
+            'message' => "Berhasil menghapus barang."
+        ]);
     }
 }

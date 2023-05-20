@@ -328,11 +328,8 @@
             select2(0);
 
 
-            /*------------------------------------------
-                --------------------------------------------
-                Click to Button
-                --------------------------------------------
-                --------------------------------------------*/
+
+            //BUTTON TAMBAH BARANG
             $('#createNew').click(function() {
                 indexAddEditRowDetail = 0;
                 $('.table-group-product').remove();
@@ -385,11 +382,8 @@
 
             })
 
-            /*------------------------------------------
-                --------------------------------------------
-                Click to Edit Button
-                --------------------------------------------
-                --------------------------------------------*/
+
+            //BUTTON EDIT BARANG
             $('body').on('click', '.editProduct', function() {
                 indexAddEditRowDetail = 0;
                 var product_id = $(this).data('id');
@@ -408,7 +402,6 @@
 
 
                     let i = 0;
-                    // document.querySelectorAll(".table-group-product").remove();
                     $('.table-group-product').remove();
 
 
@@ -472,22 +465,11 @@
                 })
             });
 
-            /*------------------------------------------
-                --------------------------------------------
-                Create Code
-                --------------------------------------------
-                --------------------------------------------*/
 
+            //BUAT ATAU UBAH BARANG
             $.validator.setDefaults({
                 submitHandler: function() {
                     let isCreate = $('#productForm').serialize();
-
-                    // if (isCreate.includes('product_id=&')) {
-                    //     alert('create barang');
-                    // } else {
-                    //     alert('edit barang');
-                    // }
-
                     $.ajax({
                         data: $('#productForm').serialize(),
                         url: "{{ route('products.store') }}",
@@ -587,18 +569,27 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
 
-                        var type_id = $(this).data("id");
+                        var product_id = $(this).data("id");
 
                         $.ajax({
                             type: "DELETE",
-                            url: "{{ route('products.store') }}" + '/' + type_id,
+                            url: "{{ route('products.store') }}" + '/' + product_id,
                             success: function(data) {
-                                Swal.fire(
-                                    'Sukses!',
-                                    'Berhasil menghapus barang',
-                                    'success'
-                                )
-                                table.draw();
+                                if (data.isError == false) {
+                                    Swal.fire(
+                                        'Sukses!',
+                                        data.message,
+                                        'success'
+                                    )
+                                    table.draw();
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        'Ada sesuatu yang salah',
+                                        'error'
+                                    )
+                                    table.draw();
+                                }
                             },
                             error: function(data) {
                                 console.log('Error: ', data);
@@ -609,9 +600,6 @@
 
 
             })
-
-
-
         });
     </script>
 @endsection
