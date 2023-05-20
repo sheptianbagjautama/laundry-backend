@@ -27,7 +27,7 @@ class ProductController extends Controller
             return DataTables::of($products)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="CheckQty" class="edit btn btn-success btn-sm qtyProduct">Cek Stok Barang</a>';
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="CheckQty" class="edit btn btn-success btn-sm checkStockProduct">Cek Stok Barang</a>';
 
                     $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Ubah</a>';
 
@@ -160,6 +160,15 @@ class ProductController extends Controller
             'isError' => false,
             'data' => $request->all(),
             'message' => 'Berhasil menyimpan barang'
+        ]);
+    }
+
+    public function getQuantities(string $id)
+    {
+        $product = Product::with(['type', 'groups'])->findOrFail($id);
+        return response()->json([
+            'data' => $product,
+            'isError' => false
         ]);
     }
 

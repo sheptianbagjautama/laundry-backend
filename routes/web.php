@@ -69,5 +69,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('getSearchTypes', [TypeController::class, 'getSearchTypes'])->name('types.select');
 
     Route::get('products/list', [ProductController::class, 'getProducts'])->name('products.list');
+    Route::get('products/{id}/quantities', [ProductController::class, 'getQuantities'])->name('products.quantities');
     Route::resource('products', ProductController::class);
 });

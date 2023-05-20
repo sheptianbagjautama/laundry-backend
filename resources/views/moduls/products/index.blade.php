@@ -60,15 +60,12 @@
             </div>
             <!-- /.card -->
 
-
+            {{-- MODAL CRUD --}}
             <div class="modal fade" id="ajaxModel">
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h4 class="modal-title" id="modelHeading">Tambah Data Barang</h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
                         </div>
                         <form id="productForm" name="productForm" class="form-horizontal">
                             <div class="modal-body">
@@ -137,6 +134,35 @@
             </div>
             <!-- /.modal -->
 
+
+            {{-- MODAL CHECK STOCK --}}
+            <div class="modal fade" id="checkStock">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="modelHeadingcheckStock">Cek Stok/Kuantitas Barang</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10px">#</th>
+                                        <th>Jenis Corak</th>
+                                        <th>Qty</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-quantities">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!-- /.modal -->
+
         </section>
         <!-- /.content -->
     </div>
@@ -171,19 +197,34 @@
         var i = 0;
         let indexAddEditRowDetail = 0;
 
+        /* Fungsi formatRupiah */
+        let formatRupiah = (angka, prefix) => {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            // tambahkan titik jika yang di input sudah menjadi angka ribuan
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        }
+
         let addRowDetail = (i, type = null) => {
             if (type == "NEW") {
                 indexAddEditRowDetail++;
-                console.log('add dari 0 => ', indexAddEditRowDetail);
             }
 
             if (type == "EDIT") {
                 if (indexAddEditRowDetail == 0) {
                     indexAddEditRowDetail = i;
-                    console.log('edit dari 0 => ', indexAddEditRowDetail)
                 } else {
                     indexAddEditRowDetail++;
-                    console.log('edit sudah init => ', indexAddEditRowDetail)
                 }
             }
 
@@ -328,7 +369,6 @@
             select2(0);
 
 
-
             //BUTTON TAMBAH BARANG
             $('#createNew').click(function() {
                 indexAddEditRowDetail = 0;
@@ -378,18 +418,46 @@
                 $('#type_id').val("");
                 $('#modelHeading').html("Membuat Barang Baru");
                 $('#productForm').trigger("reset");
-                $('#ajaxModel').modal("show");
+                $('#ajaxModel').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
 
             })
 
+            $('body').on('click', '.checkStockProduct', function() {
+                $('.tr-quantities').remove();
+                var product_id = $(this).data('id');
+                $.get("{{ route('products.index') }}" + '/' + product_id + '/quantities', function(data) {
+                    const groups = data.data.groups;
+                    let i = 1;
+
+                    groups.forEach(detail => {
+                        $("#table-body-quantities").append(`
+                        <tr class="tr-quantities">
+                            <td>${i}</td>
+                            <td>${detail.name}</td>
+                            <td>
+                                ${detail.pivot.qty}
+                            </td>
+                            <td>
+                                ${formatRupiah(detail.pivot.price.toString(), 'Rp. ')}</td>
+                        </tr>
+                    `);
+
+                        i++;
+                    });
+                });
+
+
+                $('#checkStock').modal('show');
+            });
 
             //BUTTON EDIT BARANG
             $('body').on('click', '.editProduct', function() {
                 indexAddEditRowDetail = 0;
                 var product_id = $(this).data('id');
-                console.log('product id => ', product_id)
                 $.get("{{ route('products.index') }}" + '/' + product_id + '/edit', function(data) {
-                    console.log('data ==> ', data);
                     $('#modelHeading').html("Mengubah Barang");
                     $('#saveBtn').val("edit-product");
                     $('#ajaxModel').modal('show');
@@ -406,7 +474,6 @@
 
 
                     data.groups.forEach(detail => {
-                        console.log('detail =>', detail)
                         if (i == 0) {
                             $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
                                         
@@ -476,17 +543,14 @@
                         type: "POST",
                         dataType: "json",
                         success: function(data) {
-                            console.log('data => ', data);
 
                             if (data.isError == false) {
                                 $('#productForm').trigger("reset");
                                 $('#ajaxModel').modal('hide');
 
                                 let isCreate = $('#productForm').serialize();
-                                console.log("isCreate : ", isCreate)
 
                                 if (isCreate.includes('product_id=&')) {
-                                    console.log('create')
                                     Swal.fire(
                                         'Sukses!',
                                         'Berhasil menyimpan barang',
@@ -542,11 +606,9 @@
                     element.closest('.form-group').append(error);
                 },
                 highlight: function(element, errorClass, validClass) {
-                    console.log('highlight => ', element)
                     $(element).addClass('is-invalid');
                 },
                 unhighlight: function(element, errorClass, validClass) {
-                    console.log('unhighlight => ', element)
                     $(element).removeClass('is-invalid');
                 }
             });
