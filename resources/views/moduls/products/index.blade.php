@@ -172,43 +172,42 @@
         let indexAddEditRowDetail = 0;
 
         let addRowDetail = (i, type = null) => {
-            if (indexAddEditRowDetail == 0) {
-                if (type == "NEW") {
-                    console.log("masuk new")
-                    indexAddEditRowDetail = i;
-                } else {
-                    console.log('cek i edit = ', i)
-                    indexAddEditRowDetail = i - 1;
-                }
-                console.log('index 0', indexAddEditRowDetail)
-            } else {
+            if (type == "NEW") {
                 indexAddEditRowDetail++;
-                console.log('index != 0', indexAddEditRowDetail)
+                console.log('add dari 0 => ', indexAddEditRowDetail);
             }
 
-            // alert(`Testing ${indexAddEditRowDetail}`)
-
+            if (type == "EDIT") {
+                if (indexAddEditRowDetail == 0) {
+                    indexAddEditRowDetail = i;
+                    console.log('edit dari 0 => ', indexAddEditRowDetail)
+                } else {
+                    indexAddEditRowDetail++;
+                    console.log('edit sudah init => ', indexAddEditRowDetail)
+                }
+            }
 
             $("#dynamicTable").append(`<tr class="tr-body-${indexAddEditRowDetail} table-group-product">
-                                        <td style="width: 30%">
-                                            <select  class="form-control select2 select-groups select-groups-${indexAddEditRowDetail}" style="width: 100%;"
-                                                name="group_product[${indexAddEditRowDetail}][group_id]">
-                                                <option value='0'>Pilih Jenis Corak</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="number" name="group_product[${indexAddEditRowDetail}][qty]" placeholder="Masukan Kuantitas"
-                                                class="form-control">
+                <td style="width: 30%">
+                    <input type="hidden" name="group_product[${indexAddEditRowDetail}][id]" value="">
+                    <select  class="form-control select2 select-groups select-groups-${indexAddEditRowDetail}" style="width: 100%;"
+                        name="group_product[${indexAddEditRowDetail}][group_id]">
+                        <option value='0'>Pilih Jenis Corak</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="group_product[${indexAddEditRowDetail}][qty]" placeholder="Masukan Kuantitas"
+                        class="form-control">
 
-                                        </td>
-                                        <td>
-                                            <input type="number" name="group_product[${indexAddEditRowDetail}][price]" placeholder="Masukan Harga"
-                                                class="form-control">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger remove-tr">Remove</button>
-                                        </td>
-                                    </tr>`)
+                </td>
+                <td>
+                    <input type="number" name="group_product[${indexAddEditRowDetail}][price]" placeholder="Masukan Harga"
+                        class="form-control">
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-tr">Remove</button>
+                </td>
+            </tr>`)
 
             select2(i);
         }
@@ -217,25 +216,25 @@
             ++i;
 
             $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
-                                        <td style="width: 30%">
-                                            <select  class="form-control select2 select-groups select-groups-${i}" style="width: 100%;"
-                                                name="group_product[${i}][group_id]">
-                                                <option value='0'>Pilih Jenis Corak</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="number" name="group_product[${i}][qty]" placeholder="Masukan Kuantitas"
-                                                class="form-control">
+            <td style="width: 30%">
+                <select  class="form-control select2 select-groups select-groups-${i}" style="width: 100%;"
+                    name="group_product[${i}][group_id]">
+                    <option value='0'>Pilih Jenis Corak</option>
+                </select>
+            </td>
+            <td>
+                <input type="number" name="group_product[${i}][qty]" placeholder="Masukan Kuantitas"
+                    class="form-control">
 
-                                        </td>
-                                        <td>
-                                            <input type="number" name="group_product[${i}][price]" placeholder="Masukan Harga"
-                                                class="form-control">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger remove-tr">Remove</button>
-                                        </td>
-                                    </tr>`)
+            </td>
+            <td>
+                <input type="number" name="group_product[${i}][price]" placeholder="Masukan Harga"
+                    class="form-control">
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger remove-tr">Remove</button>
+            </td>
+        </tr>`)
 
             select2(i);
         });
@@ -268,29 +267,6 @@
                 }
             });
         }
-        // function select2(index) {
-        //     $(`.select-groups-${index}`).select2({
-        //         theme: 'bootstrap4',
-        //         ajax: {
-        //             url: "{{ route('groups.select') }}",
-        //             type: "post",
-        //             dataType: 'json',
-        //             delay: 250,
-        //             data: function(params) {
-        //                 return {
-        //                     _token: CSRF_TOKEN,
-        //                     search: params.term // search term
-        //                 };
-        //             },
-        //             processResults: function(response) {
-        //                 return {
-        //                     results: response
-        //                 };
-        //             },
-        //             cache: true
-        //         }
-        //     });
-        // }
 
         $(function() {
             $.ajaxSetup({
@@ -361,24 +337,24 @@
                 indexAddEditRowDetail = 0;
                 $('.table-group-product').remove();
 
-                $("#dynamicTable").append(`<tr class="tr-body-${0} table-group-product">
+                $("#dynamicTable").append(`<tr class="tr-body-${indexAddEditRowDetail} table-group-product">
                 <td style="width: 30%">
-                    <select class="form-control select2 select-groups select-groups-${0}" style="width: 100%;"
-                        name="group_product[${0}][group_id]">
+                    <select class="form-control select2 select-groups select-groups-${indexAddEditRowDetail}" style="width: 100%;"
+                        name="group_product[${indexAddEditRowDetail}][group_id]">
                         <option value='0'>Pilih Jenis Corak</option>
                     </select>
                 </td>
                 <td>
-                    <input type="number" name="group_product[${0}][qty]" placeholder="Masukan Kuantitas"
+                    <input type="number" name="group_product[${indexAddEditRowDetail}][qty]" placeholder="Masukan Kuantitas"
                         class="form-control">
 
                 </td>
                 <td>
-                    <input type="number" name="group_product[${0}][price]" placeholder="Masukan Harga"
+                    <input type="number" name="group_product[${indexAddEditRowDetail}][price]" placeholder="Masukan Harga"
                         class="form-control">
                 </td>
                 <td>
-                    <button type="button" onclick=addRowDetail(${0},'NEW') name="addDetail" id="addDetail"
+                    <button type="button" onclick=addRowDetail(${indexAddEditRowDetail},'NEW') name="addDetail" id="addDetail"
                         class="btn btn-primary">Tambah Lagi</button>
                 </td>
             </tr>`);
@@ -401,6 +377,7 @@
 
 
                 $('#saveBtn').val("create-products");
+                $('#product_id').val("");
                 $('#type_id').val("");
                 $('#modelHeading').html("Membuat Barang Baru");
                 $('#productForm').trigger("reset");
@@ -436,9 +413,12 @@
 
 
                     data.groups.forEach(detail => {
+                        console.log('detail =>', detail)
                         if (i == 0) {
                             $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
+                                        
                                         <td style="width: 30%">
+                                            <input type="hidden" name="group_product[${i}][id]" value=${detail.pivot.id}>
                                             <select  class="form-control select2 select-groups select-groups-${i}" style="width: 100%;"
                                                 name="group_product[${i}][group_id]">
                                                 <option value='${detail.id}' selected>${detail.name}</option>
@@ -454,14 +434,16 @@
                                                 class="form-control">
                                         </td>
                                         <td>
-                                            <button type="button" onclick=addRowDetail(${data.groups.length}) name="addEdit" id="addEdit"
+                                            <button type="button" onclick=addRowDetail(${data.groups.length},'EDIT') name="addEdit" id="addEdit"
                                                 class="btn btn-primary">Tambah Lagi</button>
                                         </td>
                                     </tr>`)
 
                         } else {
                             $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
+                                        
                                         <td style="width: 30%">
+                                            <input type="hidden" name="group_product[${i}][id]" value=${detail.pivot.id}>
                                             <select  class="form-control select2 select-groups select-groups-${i}" style="width: 100%;"
                                                 name="group_product[${i}][group_id]">
                                                 <option value='${detail.id}' selected>${detail.name}</option>
@@ -500,58 +482,58 @@
                 submitHandler: function() {
                     let isCreate = $('#productForm').serialize();
 
-                    if (isCreate.includes('product_id=&')) {
-                        alert('create barang');
-                    } else {
-                        alert('edit barang');
-                    }
+                    // if (isCreate.includes('product_id=&')) {
+                    //     alert('create barang');
+                    // } else {
+                    //     alert('edit barang');
+                    // }
 
-                    // $.ajax({
-                    //     data: $('#productForm').serialize(),
-                    //     url: "{{ route('products.store') }}",
-                    //     type: "POST",
-                    //     dataType: "json",
-                    //     success: function(data) {
-                    //         console.log('data => ', data);
+                    $.ajax({
+                        data: $('#productForm').serialize(),
+                        url: "{{ route('products.store') }}",
+                        type: "POST",
+                        dataType: "json",
+                        success: function(data) {
+                            console.log('data => ', data);
 
-                    //         if (data.isError == false) {
-                    //             $('#productForm').trigger("reset");
-                    //             $('#ajaxModel').modal('hide');
+                            if (data.isError == false) {
+                                $('#productForm').trigger("reset");
+                                $('#ajaxModel').modal('hide');
 
-                    //             let isCreate = $('#productForm').serialize();
-                    //             console.log("isCreate : ", isCreate)
+                                let isCreate = $('#productForm').serialize();
+                                console.log("isCreate : ", isCreate)
 
-                    //             if (isCreate.includes('product_id=&')) {
-                    //                 console.log('create')
-                    //                 Swal.fire(
-                    //                     'Sukses!',
-                    //                     'Berhasil menyimpan barang',
-                    //                     'success'
-                    //                 )
-                    //             } else {
-                    //                 Swal.fire(
-                    //                     'Sukses!',
-                    //                     'Berhasil mengubah barang',
-                    //                     'success'
-                    //                 )
-                    //             }
+                                if (isCreate.includes('product_id=&')) {
+                                    console.log('create')
+                                    Swal.fire(
+                                        'Sukses!',
+                                        'Berhasil menyimpan barang',
+                                        'success'
+                                    )
+                                } else {
+                                    Swal.fire(
+                                        'Sukses!',
+                                        'Berhasil mengubah barang',
+                                        'success'
+                                    )
+                                }
 
 
-                    //             table.draw();
-                    //         } else {
-                    //             Swal.fire(
-                    //                 'Gagal!',
-                    //                 data.message,
-                    //                 'error'
-                    //             )
-                    //         }
+                                table.draw();
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    data.message,
+                                    'error'
+                                )
+                            }
 
-                    //     },
-                    //     error: function(data) {
-                    //         console.log('Error: ', data);
-                    //         $('#saveBtn').html("Simpan Perubahan");
-                    //     }
-                    // });
+                        },
+                        error: function(data) {
+                            console.log('Error: ', data);
+                            $('#saveBtn').html("Simpan Perubahan");
+                        }
+                    });
                 }
             });
 

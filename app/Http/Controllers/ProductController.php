@@ -122,14 +122,39 @@ class ProductController extends Controller
             }
         }
 
-        // if ($request->product_id == null) {
-        //     $product =  Product::create($request->all());
+        if ($request->product_id == null) {
+            $product =  Product::create($request->all());
 
-        //     foreach ($group_products as $key => $gp) {
-        //         $gp['product_id'] = $product->id;
-        //         GroupProduct::create($gp);
-        //     }
-        // }
+            foreach ($group_products as $key => $gp) {
+                $gp['product_id'] = $product->id;
+                GroupProduct::create($gp);
+            }
+
+            return response()->json([
+                'isError' => false,
+                'data' => $request->all(),
+                'message' => 'Berhasil menyimpan barang'
+            ]);
+        } else {
+            $product = Product::findOrFail($request->product_id);
+            $product->update($request->all());
+
+            foreach ($group_products as $key => $gp) {
+                if ($gp['id'] != null) {
+                    $groupProduct = GroupProduct::findOrFail($gp['id']);
+                    $groupProduct->update($gp);
+                } else {
+                    $gp['product_id'] = $product->id;
+                    GroupProduct::create($gp);
+                }
+            }
+
+            return response()->json([
+                'isError' => false,
+                'data' => $request->all(),
+                'message' => 'Berhasil mengubah barang'
+            ]);
+        }
 
         return response()->json([
             'isError' => false,

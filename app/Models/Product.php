@@ -31,6 +31,6 @@ class Product extends Model
 
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(Group::class, 'group_product')->withPivot('qty', 'price')->withTimestamps();
+        return $this->belongsToMany(Group::class, 'group_product')->withPivot('id', 'qty', 'price')->withTimestamps();
     }
 }
