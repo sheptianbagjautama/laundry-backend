@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GroupProduct;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use DataTables;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -12,17 +14,29 @@ class ProductController extends Controller
     public function getProducts(Request $request)
     {
         if ($request->ajax()) {
-            $data = Product::latest()->get();
-            return Datatables::of($data)
+            $products = Product::with(['type', 'groups'])->latest()->get();
+
+            foreach ($products as $key => $product) {
+                $stocks = '';
+                foreach ($product['groups'] as $key => $gp) {
+                    $stocks = $stocks . 'Stok : ' . $gp['name'] . ' = ' . $gp['pivot']['qty'] . ' pcs, Harga = ' . $gp['pivot']['price'] . '';
+                }
+                $product['stocks'] = $stocks;
+            }
+
+            return DataTables::of($products)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Ubah</a>';
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="CheckQty" class="edit btn btn-success btn-sm qtyProduct">Cek Stok Barang</a>';
+
+                    $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Ubah</a>';
 
                     $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Hapus</a>';
-
                     return $btn;
                 })
                 ->rawColumns(['action'])
+
+
                 ->make(true);
         }
     }
@@ -31,6 +45,26 @@ class ProductController extends Controller
      */
     public function index()
     {
+        // $products = Product::with(['type', 'groups'])->latest()->get();
+
+
+        // foreach ($products as $key => $product) {
+        //     $stocks = '';
+        //     foreach ($product['groups'] as $key => $gp) {
+        //         $stocks = $stocks . 'Stok : ' . $gp['name'] . ' = ' . $gp['pivot']['qty'] . ' pcs, Harga = ' . $gp['pivot']['price'] . '<br>';
+        //     }
+        //     $product['stocks'] = $stocks;
+        // }
+
+
+
+        // return response()->json([
+        //     // 'data' => $datas,
+        //     'data' => $products,
+
+        // ]);
+
+
         $title = 'Barang';
         $subtitle = 'Halaman Barang';
         return view('moduls.products.index', [
@@ -88,10 +122,19 @@ class ProductController extends Controller
             }
         }
 
+        // if ($request->product_id == null) {
+        //     $product =  Product::create($request->all());
+
+        //     foreach ($group_products as $key => $gp) {
+        //         $gp['product_id'] = $product->id;
+        //         GroupProduct::create($gp);
+        //     }
+        // }
+
         return response()->json([
             'isError' => false,
             'data' => $request->all(),
-            'message' => 'berhasil'
+            'message' => 'Berhasil menyimpan barang'
         ]);
     }
 
@@ -108,7 +151,9 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        //
+
+        $type = Product::with(['type', 'groups'])->find($id);
+        return response()->json($type);
     }
 
     /**

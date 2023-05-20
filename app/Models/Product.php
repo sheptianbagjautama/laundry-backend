@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -18,13 +19,18 @@ class Product extends Model
     ];
 
 
-    public function type(): HasOne
+    // public function type(): HasOne
+    // {
+    //     return $this->hasOne(Type::class);
+    // }
+
+    public function type(): BelongsTo
     {
-        return $this->hasOne(Type::class);
+        return $this->belongsTo(Type::class);
     }
 
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(Group::class, 'group_product');
+        return $this->belongsToMany(Group::class, 'group_product')->withPivot('qty', 'price')->withTimestamps();
     }
 }
