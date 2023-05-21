@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\GroupProduct;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Http\RedirectResponse;
@@ -130,6 +131,36 @@ class GroupController extends Controller
             $response[] = array(
                 "id" => $group->id,
                 "text" => $group->name
+            );
+        }
+        return response()->json($response);
+    }
+
+    public function getSelectGroups(Request $request)
+    {
+        $search = $request->search;
+        $product_id = $request->product_id;
+
+        if ($search == '') {
+            $groups = GroupProduct::with(['product', 'group'])
+                ->where('product_id', $product_id)
+                ->limit(5)
+                ->get();
+        } else {
+            $groups = GroupProduct::whereHas('group', function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orderby('name', 'asc');
+            })
+                ->where('product_id', $product_id)
+                ->limit(5)
+                ->get();
+        }
+
+        $response = array();
+        foreach ($groups as $group) {
+            $response[] = array(
+                "id" => $group->group->id,
+                "text" => $group->group->name
             );
         }
         return response()->json($response);

@@ -7,8 +7,6 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use DataTables;
 
-use function PHPUnit\Framework\isEmpty;
-
 class ProductController extends Controller
 {
     public function getProducts(Request $request)
@@ -170,6 +168,26 @@ class ProductController extends Controller
             'data' => $product,
             'isError' => false
         ]);
+    }
+
+    public function getSelectProducts(Request $request)
+    {
+        $search = $request->search;
+
+        if ($search == '') {
+            $groups = Product::orderby('name', 'asc')->select('id', 'name')->limit(5)->get();
+        } else {
+            $groups = Product::orderby('name', 'asc')->select('id', 'name')->where('name', 'like', '%' . $search . '%')->limit(5)->get();
+        }
+
+        $response = array();
+        foreach ($groups as $group) {
+            $response[] = array(
+                "id" => $group->id,
+                "text" => $group->name
+            );
+        }
+        return response()->json($response);
     }
 
     /**
