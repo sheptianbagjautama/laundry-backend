@@ -281,6 +281,15 @@
             //BUTTON TAMBAH BARANG
             $('#createNew').click(function() {
                 $('#receive_id').val("");
+
+                $('#select-product')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                $('#select-product').append(
+                    `<option value='' disabled selected>Pilih Barang</option>`);
+
                 $('#modealHeading').html("Membuat Penerimaan Baru");
                 $('#receiveForm').trigger("reset");
                 $('#ajaxModel').modal({
@@ -333,20 +342,11 @@
 
                                 let isCreate = $('#receiveForm').serialize();
 
-                                if (isCreate.includes('receive_id=&')) {
-                                    Swal.fire(
-                                        'Sukses!',
-                                        'Berhasil menyimpan penerimaan barang',
-                                        'success'
-                                    )
-                                } else {
-                                    Swal.fire(
-                                        'Sukses!',
-                                        'Berhasil mengubah penerimaan barang',
-                                        'success'
-                                    )
-                                }
-
+                                Swal.fire(
+                                    'Sukses!',
+                                    'Berhasil menyimpan penerimaan barang',
+                                    'success'
+                                )
 
                                 table.draw();
                             } else {

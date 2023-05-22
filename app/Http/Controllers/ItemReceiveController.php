@@ -29,12 +29,6 @@ class ItemReceiveController extends Controller
      */
     public function index()
     {
-        // $item_receives = ItemReceive::with(['product', 'group'])->latest()->get();
-        // return response()->json([
-        //     'data' => $item_receives
-        // ]);
-
-
         $title = 'Penerimaan Barang';
         $subtitle = 'Halaman Penerimaan Barang';
         return view('moduls.itemreceives.index', [
@@ -108,10 +102,10 @@ class ItemReceiveController extends Controller
 
         //KURANGI STOK TERLEBIH DAHULU SEBELUM HAPUS PENERIMAAN BARANG
         $group_product = GroupProduct::where('product_id', $item_receive->product_id)
-            ->where('group_id', $item_receive->group_id);
+            ->where('group_id', $item_receive->group_id)->get();
 
-        $group_product->qty -= $item_receive->qty;
-        $group_product->update();
+        $group_product[0]->qty -= $item_receive->qty;
+        $group_product[0]->save();
 
         $item_receive->delete();
 
