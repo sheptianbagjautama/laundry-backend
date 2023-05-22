@@ -17,9 +17,7 @@ class ItemReceiveController extends Controller
             return DataTables::of($item_receives)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editItemReceive">Ubah</a>';
-
-                    $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteItemReceive">Hapus</a>';
+                    $btn = ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteItemReceive">Hapus</a>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
@@ -58,7 +56,45 @@ class ItemReceiveController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if ($request->receive_id == null) {
+            ItemReceive::create($request->all());
+
+            $group_product = GroupProduct::where('product_id', $request->product_id)
+                ->where('group_id', $request->group_id)->get();
+
+            if (count($group_product)) {
+                $group_product[0]['qty'] += $request->qty;
+                $group_product[0]->save();
+            }
+
+            return response()->json([
+                'isError' => false,
+                'data' => $request->all(),
+                'group_product' => $group_product,
+                'message' => 'Berhasil menyimpan penerimaan barang.'
+            ]);
+        } else {
+            $item_receive = ItemReceive::findOrFail($request->receive_id);
+
+            if ($request->product_id)
+                $group_product = GroupProduct::where('product_id', $request->product_id)
+                    ->where('group_id', $request->group_id)->get();
+
+            if (count($group_product)) {
+                $group_product[0]['qty'] -= $item_receive->qty;
+                $group_product[0]['qty'] += $request->qty;
+                $group_product[0]->save();
+            }
+
+            $item_receive->update($request->all());
+
+            return response()->json([
+                'isError' => false,
+                'data' => $request->all(),
+                'group_product' => $group_product,
+                'message' => 'Berhasil mengubah penerimaan barang.'
+            ]);
+        }
     }
 
     /**
@@ -74,7 +110,7 @@ class ItemReceiveController extends Controller
      */
     public function edit(string $id)
     {
-        $type = ItemReceive::with(['product', 'grpup'])->find($id);
+        $type = ItemReceive::with(['product', 'group'])->find($id);
         return response()->json($type);
     }
 

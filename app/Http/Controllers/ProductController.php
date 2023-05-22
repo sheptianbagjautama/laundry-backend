@@ -157,7 +157,7 @@ class ProductController extends Controller
         return response()->json([
             'isError' => false,
             'data' => $request->all(),
-            'message' => 'Berhasil menyimpan barang'
+            'message' => 'Ada sesuatu yang salah.'
         ]);
     }
 

@@ -291,7 +291,28 @@
 
             //BUTTON EDIT BARANG
             $('body').on('click', '.editItemReceive', function() {
-                alert("Edit Penerimaan Barang")
+                var receive_id = $(this).data('id');
+
+                $.get("{{ route('item-receives.index') }}" + '/' + receive_id + '/edit', function(data) {
+                    console.log('data => ', data);
+                    $('#modelHeading').html("Mengubah Penerimaan Barang");
+                    $('#saveBtn').val("edit-item-receive");
+                    $('#ajaxModel').modal('show');
+                    $('#receive_id').val(data.id);
+                    $('#select-product').val(data.product_id);
+                    $('#select-group').val(data.group_id);
+                    $('#qty').val(data.qty);
+
+                    $('#select-product').append(
+                        `<option value="${data.product.id}" selected>${data.product.name}</option>`
+                    );
+
+                    $('#select-group').append(
+                        `<option value="${data.group.id}" selected>${data.group.name}</option>`
+                    );
+
+                    $('#select-group').prop('disabled', false);
+                })
             });
 
 
@@ -305,7 +326,7 @@
                         type: "POST",
                         dataType: "json",
                         success: function(data) {
-
+                            console.log('data => ', data)
                             if (data.isError == false) {
                                 $('#receiveForm').trigger("reset");
                                 $('#ajaxModel').modal('hide');
