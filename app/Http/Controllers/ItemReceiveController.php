@@ -56,45 +56,22 @@ class ItemReceiveController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->receive_id == null) {
-            ItemReceive::create($request->all());
+        ItemReceive::create($request->all());
 
-            $group_product = GroupProduct::where('product_id', $request->product_id)
-                ->where('group_id', $request->group_id)->get();
+        $group_product = GroupProduct::where('product_id', $request->product_id)
+            ->where('group_id', $request->group_id)->get();
 
-            if (count($group_product)) {
-                $group_product[0]['qty'] += $request->qty;
-                $group_product[0]->save();
-            }
-
-            return response()->json([
-                'isError' => false,
-                'data' => $request->all(),
-                'group_product' => $group_product,
-                'message' => 'Berhasil menyimpan penerimaan barang.'
-            ]);
-        } else {
-            $item_receive = ItemReceive::findOrFail($request->receive_id);
-
-            if ($request->product_id)
-                $group_product = GroupProduct::where('product_id', $request->product_id)
-                    ->where('group_id', $request->group_id)->get();
-
-            if (count($group_product)) {
-                $group_product[0]['qty'] -= $item_receive->qty;
-                $group_product[0]['qty'] += $request->qty;
-                $group_product[0]->save();
-            }
-
-            $item_receive->update($request->all());
-
-            return response()->json([
-                'isError' => false,
-                'data' => $request->all(),
-                'group_product' => $group_product,
-                'message' => 'Berhasil mengubah penerimaan barang.'
-            ]);
+        if (count($group_product)) {
+            $group_product[0]['qty'] += $request->qty;
+            $group_product[0]->save();
         }
+
+        return response()->json([
+            'isError' => false,
+            'data' => $request->all(),
+            'group_product' => $group_product,
+            'message' => 'Berhasil menyimpan penerimaan barang.'
+        ]);
     }
 
     /**
