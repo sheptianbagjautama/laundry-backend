@@ -4,6 +4,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ItemReceiveController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\TypeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -77,4 +78,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('item-receives/list', [ItemReceiveController::class, 'getItemReceive'])->name('item-receives.list');
     Route::resource('item-receives', ItemReceiveController::class);
+
+    Route::get('sales/list', [SalesController::class, 'getSales'])->name('sales.list');
+    Route::resource('sales', SalesController::class);
 });
