@@ -3,6 +3,7 @@
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ItemReceiveController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\TypeController;
@@ -85,4 +86,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('users/list', [UserController::class, 'getUser'])->name('users.list');
     Route::resource('users', UserController::class);
+
+    Route::get('orders/list', [OrderController::class, 'getOrder'])->name('orders.list');
+    Route::resource('orders', OrderController::class);
 });
