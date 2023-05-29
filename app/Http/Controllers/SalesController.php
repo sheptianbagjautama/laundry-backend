@@ -108,4 +108,24 @@ class SalesController extends Controller
             'message' => 'Berhasil menghapus sales'
         ]);
     }
+
+    public function getSelectSales(Request $request)
+    {
+        $search = $request->search;
+
+        if ($search == '') {
+            $sales = Sales::orderby('name', 'asc')->select('id', 'name')->limit(5)->get();
+        } else {
+            $sales = Sales::orderby('name', 'asc')->select('id', 'name')->where('name', 'like', '%' . $search . '%')->limit(5)->get();
+        }
+
+        $response = array();
+        foreach ($sales as $s) {
+            $response[] = array(
+                "id" => $s->id,
+                "text" => $s->name
+            );
+        }
+        return response()->json($response);
+    }
 }

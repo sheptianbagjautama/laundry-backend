@@ -70,31 +70,54 @@
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="modelHeading">Tambah Data Barang</h4>
+                            <h4 class="modal-title" id="modelHeading">Tambah Data Penjualan</h4>
                         </div>
-                        <form id="productForm" name="productForm" class="form-horizontal">
+                        <form id="orderForm" name="orderForm" class="form-horizontal">
                             <div class="modal-body">
 
-                                <input type="hidden" name="product_id" id="product_id">
+                                <input type="hidden" name="order_id" id="order_id">
+
                                 <div class="form-group">
-                                    <label for="name" class="col-sm-2 control-label">Nama</label>
+                                    <label for="name" class="col-sm-2 control-label">Kode Penjualan</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="name" name="name"
-                                            placeholder="Masukan nama barang" />
+                                        <input type="text" class="form-control" id="code" name="code" disabled />
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="name" class="col-sm-2 control-label">Tipe</label>
+                                    <label for="name" class="col-sm-2 control-label">Sales</label>
                                     <div class="col-sm-12">
-                                        <select id='select-types' class="form-control select2" style="width: 100%;"
-                                            name="type_id">
-                                            <option value='' disabled selected>Pilih Tipe</option>
+                                        <select id='select-sales' class="form-control select2" style="width: 100%;"
+                                            name="sale_id">
+                                            <option value='' disabled selected>Pilih Sales</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <table class="table table-bordered" id="dynamicTable">
+                                <div class="form-group">
+                                    <label for="name" class="col-sm-2 control-label">Nama Pelanggan</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="customer_name" name="customer_name"
+                                            placeholder="Masukan nama pelanggan" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="name" class="col-sm-2 control-label">No. HP Pelanggan</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="customer_phone" name="customer_phone"
+                                            placeholder="Masukan No.HP Pelanggan" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="name" class="col-sm-2 control-label">Alamat Pelanggan</label>
+                                    <div class="col-sm-12">
+                                        <textarea class="form-control" rows="3" placeholder="Masukan Alamat Pelanggan" name="customer_address"></textarea>
+                                    </div>
+                                </div>
+
+                                {{-- <table class="table table-bordered" id="dynamicTable">
                                     <hr />
                                     <h6>Detail Jenis Corak</h6>
                                     <tr>
@@ -124,7 +147,7 @@
                                                 class="btn btn-primary">Tambah Lagi</button>
                                         </td>
                                     </tr>
-                                </table>
+                                </table> --}}
 
                             </div>
                             <div class="modal-footer justify-content-between">
@@ -369,124 +392,126 @@
             });
 
             //Search Types
-            // $("#select-types").select2({
-            //     theme: 'bootstrap4',
-            //     ajax: {
-            //         url: "{{ route('types.select') }}",
-            //         type: "post",
-            //         dataType: 'json',
-            //         delay: 250,
-            //         data: function(params) {
-            //             return {
-            //                 _token: CSRF_TOKEN,
-            //                 search: params.term // search term
-            //             };
-            //         },
-            //         processResults: function(response) {
-            //             return {
-            //                 results: response
-            //             };
-            //         },
-            //         cache: true
-            //     }
-            // });
+            $("#select-sales").select2({
+                theme: 'bootstrap4',
+                ajax: {
+                    url: "{{ route('sales.select-sales') }}",
+                    type: "post",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            _token: CSRF_TOKEN,
+                            search: params.term // search term
+                        };
+                    },
+                    processResults: function(response) {
+                        console.log(response)
+                        return {
+                            results: response
+                        };
+                    },
+                    cache: true
+                }
+            });
 
             // select2(0);
 
 
             //BUTTON TAMBAH BARANG
-            // $('#createNew').click(function() {
-            //     indexAddEditRowDetail = 0;
-            //     $('.table-group-product').remove();
+            $('#createNew').click(function() {
+                // indexAddEditRowDetail = 0;
+                // $('.table-group-product').remove();
 
-            //     $("#dynamicTable").append(`<tr class="tr-body-${indexAddEditRowDetail} table-group-product">
-        //     <td style="width: 30%">
-        //         <select class="form-control select2 select-groups select-groups-${indexAddEditRowDetail}" style="width: 100%;"
-        //             name="group_product[${indexAddEditRowDetail}][group_id]">
-        //             <option value='0'>Pilih Jenis Corak</option>
-        //         </select>
-        //     </td>
-        //     <td>
-        //         <input type="number" name="group_product[${indexAddEditRowDetail}][qty]" placeholder="Masukan Kuantitas"
-        //             class="form-control">
+                // $("#dynamicTable").append(`<tr class="tr-body-${indexAddEditRowDetail} table-group-product">
+            //         <td style="width: 30%">
+            //             <select class="form-control select2 select-groups select-groups-${indexAddEditRowDetail}" style="width: 100%;"
+            //                 name="group_product[${indexAddEditRowDetail}][group_id]">
+            //                 <option value='0'>Pilih Jenis Corak</option>
+            //             </select>
+            //         </td>
+            //         <td>
+            //             <input type="number" name="group_product[${indexAddEditRowDetail}][qty]" placeholder="Masukan Kuantitas"
+            //                 class="form-control">
 
-        //     </td>
-        //     <td>
-        //         <input type="number" name="group_product[${indexAddEditRowDetail}][price]" placeholder="Masukan Harga"
-        //             class="form-control">
-        //     </td>
-        //     <td>
-        //         <button type="button" onclick=addRowDetail(${indexAddEditRowDetail},'NEW') name="addDetail" id="addDetail"
-        //             class="btn btn-primary">Tambah Lagi</button>
-        //     </td>
-        // </tr>`);
+            //         </td>
+            //         <td>
+            //             <input type="number" name="group_product[${indexAddEditRowDetail}][price]" placeholder="Masukan Harga"
+            //                 class="form-control">
+            //         </td>
+            //         <td>
+            //             <button type="button" onclick=addRowDetail(${indexAddEditRowDetail},'NEW') name="addDetail" id="addDetail"
+            //                 class="btn btn-primary">Tambah Lagi</button>
+            //         </td>
+            //     </tr>`
+                // );
 
-            //     //Remove Option Select Type
-            //     $('#select-types')
-            //         .find('option')
-            //         .remove()
-            //         .end();
+                // //Remove Option Select Type
+                // $('#select-types')
+                //     .find('option')
+                //     .remove()
+                //     .end();
 
-            //     $('#select-types').append(
-            //         `<option value='' disabled selected>Pilih Tipe</option>`);
+                // $('#select-types').append(
+                //     `<option value='' disabled selected>Pilih Tipe</option>`);
 
-            //     select2(0);
+                // select2(0);
 
-            //     //Remove validation class
-            //     $('.is-invalid').removeClass("is-invalid");
-            //     $('span.error').remove();
-
-
-
-            //     $('#saveBtn').val("create-products");
-            //     $('#product_id').val("");
-            //     $('#type_id').val("");
-            //     $('#modelHeading').html("Membuat Barang Baru");
-            //     $('#productForm').trigger("reset");
-            //     $('#ajaxModel').modal({
-            //         backdrop: 'static',
-            //         keyboard: false
-            //     });
-
-            // })
-
-            // $('body').on('click', '.checkStockProduct', function() {
-            //     $('.tr-quantities').remove();
-            //     var product_id = $(this).data('id');
-            //     $.get("{{ route('products.index') }}" + '/' + product_id + '/quantities', function(data) {
-            //         const groups = data.data.groups;
-            //         let i = 1;
-
-            //         groups.forEach(detail => {
-            //             $("#table-body-quantities").append(`
-        //             <tr class="tr-quantities">
-        //                 <td>${i}</td>
-        //                 <td>${detail.name}</td>
-        //                 <td>
-        //                     ${detail.pivot.qty}
-        //                 </td>
-        //                 <td>
-        //                     ${formatRupiah(detail.pivot.price.toString(), 'Rp. ')}</td>
-        //             </tr>
-        //         `);
-
-            //             i++;
-            //         });
-            //     });
+                // //Remove validation class
+                // $('.is-invalid').removeClass("is-invalid");
+                // $('span.error').remove();
 
 
-            //     $('#checkStock').modal('show');
-            // });
+
+                $('#saveBtn').val("create-orders");
+                $('#order_id').val("");
+                $('#sale_id').val("");
+                $('#modelHeading').html("Membuat Penjualan Baru");
+                $('#orderForm').trigger("reset");
+                $('#ajaxModel').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+
+            })
+
+            $('body').on('click', '.checkStockProduct', function() {
+                $('.tr-quantities').remove();
+                var order_id = $(this).data('id');
+                $.get("{{ route('products.index') }}" + '/' + order_id + '/quantities', function(data) {
+                    const groups = data.data.groups;
+                    let i = 1;
+
+                    groups.forEach(detail => {
+                        $("#table-body-quantities").append(`
+                    <tr class="tr-quantities">
+                        <td>${i}</td>
+                        <td>${detail.name}</td>
+                        <td>
+                            ${detail.pivot.qty}
+                        </td>
+                        <td>
+                            ${formatRupiah(detail.pivot.price.toString(), 'Rp. ')}</td>
+                    </tr>
+                `);
+
+                        i++;
+                    });
+                });
+
+
+                $('#checkStock').modal('show');
+            });
 
             //BUTTON EDIT BARANG
             // $('body').on('click', '.editProduct', function() {
             //     indexAddEditRowDetail = 0;
-            //     var product_id = $(this).data('id');
-            //     $.get("{{ route('products.index') }}" + '/' + product_id + '/edit', function(data) {
+            //     var order_id = $(this).data('id');
+            //     $.get("{{ route('products.index') }}" + '/' + order_id + '/edit', function(data) {
             //         $('#modelHeading').html("Mengubah Barang");
             //         $('#saveBtn').val("edit-product");
             //         $('#ajaxModel').modal('show');
-            //         $('#product_id').val(data.id);
+            //         $('#order_id').val(data.id);
             //         $('#name').val(data.name);
             //         $('#type_id').val(data.type.id);
 
@@ -561,21 +586,21 @@
             //BUAT ATAU UBAH BARANG
             // $.validator.setDefaults({
             //     submitHandler: function() {
-            //         let isCreate = $('#productForm').serialize();
+            //         let isCreate = $('#orderForm').serialize();
             //         $.ajax({
-            //             data: $('#productForm').serialize(),
+            //             data: $('#orderForm').serialize(),
             //             url: "{{ route('products.store') }}",
             //             type: "POST",
             //             dataType: "json",
             //             success: function(data) {
 
             //                 if (data.isError == false) {
-            //                     $('#productForm').trigger("reset");
+            //                     $('#orderForm').trigger("reset");
             //                     $('#ajaxModel').modal('hide');
 
-            //                     let isCreate = $('#productForm').serialize();
+            //                     let isCreate = $('#orderForm').serialize();
 
-            //                     if (isCreate.includes('product_id=&')) {
+            //                     if (isCreate.includes('order_id=&')) {
             //                         Swal.fire(
             //                             'Sukses!',
             //                             'Berhasil menyimpan barang',
@@ -608,7 +633,7 @@
             //     }
             // });
 
-            // $('#productForm').validate({
+            // $('#orderForm').validate({
             //     rules: {
             //         name: {
             //             required: true,
@@ -656,11 +681,11 @@
             //     }).then((result) => {
             //         if (result.isConfirmed) {
 
-            //             var product_id = $(this).data("id");
+            //             var order_id = $(this).data("id");
 
             //             $.ajax({
             //                 type: "DELETE",
-            //                 url: "{{ route('products.store') }}" + '/' + product_id,
+            //                 url: "{{ route('products.store') }}" + '/' + order_id,
             //                 success: function(data) {
             //                     if (data.isError == false) {
             //                         Swal.fire(

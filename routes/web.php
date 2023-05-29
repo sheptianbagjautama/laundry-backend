@@ -83,6 +83,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('sales/list', [SalesController::class, 'getSales'])->name('sales.list');
     Route::resource('sales', SalesController::class);
+    Route::post('sales/select-sales', [SalesController::class, 'getSelectSales'])->name('sales.select-sales');
 
     Route::get('users/list', [UserController::class, 'getUser'])->name('users.list');
     Route::resource('users', UserController::class);
