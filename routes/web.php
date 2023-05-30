@@ -29,6 +29,9 @@ Route::get('template', function () {
     return view('dashboard');
 });
 
+
+
+
 Auth::routes();
 
 
@@ -68,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('groups/{id}', [GroupController::class, 'destroy'])->name('groups.destroy');
     Route::post('getSearchGroups', [GroupController::class, 'getSearchGroups'])->name('groups.select');
     Route::post('groups/select-groups', [GroupController::class, 'getSelectGroups'])->name('groups.select-groups');
+    Route::post('groups/price', [GroupController::class, 'setPrice'])->name('groups.price');
 
     Route::get('types/list', [TypeController::class, 'getTypes'])->name('types.list');
     Route::resource('types', TypeController::class);
@@ -89,5 +93,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
 
     Route::get('orders/list', [OrderController::class, 'getOrder'])->name('orders.list');
+    Route::get('orders/code', [OrderController::class, 'code'])->name('orders.code');
     Route::resource('orders', OrderController::class);
 });

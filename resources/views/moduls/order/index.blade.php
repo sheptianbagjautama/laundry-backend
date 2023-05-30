@@ -80,7 +80,7 @@
                                 <div class="form-group">
                                     <label for="name" class="col-sm-2 control-label">Kode Penjualan</label>
                                     <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="code" name="code" disabled />
+                                        <input type="text" class="form-control" id="code" name="code" readonly />
                                     </div>
                                 </div>
 
@@ -117,42 +117,54 @@
                                     </div>
                                 </div>
 
-                                {{-- <table class="table table-bordered" id="dynamicTable">
+                                <table class="table table-bordered" id="dynamicTable">
                                     <hr />
-                                    <h6>Detail Jenis Corak</h6>
+                                    <h6>Detail Barang</h6>
                                     <tr>
-                                        <th>Jenis Corak</th>
-                                        <th>Qty</th>
+                                        <th>Barang</th>
+                                        <th>Jenis Barang</th>
                                         <th>Harga</th>
+                                        <th>Qty</th>
+                                        <th>Total</th>
                                         <th>Aksi</th>
                                     </tr>
                                     <tr class="tr-body-0 table-group-product">
-                                        <td style="width: 30%">
-                                            <select class="form-control select2 select-groups select-groups-0"
-                                                style="width: 100%;" name="group_product[0][group_id]">
+                                        <td style="width: 20%">
+                                            <select class="form-control select2 select-product select-product-0"
+                                                style="width: 100%;" name="order_details[0][product_id]">
+                                                <option value='0'>Pilih Barang</option>
+                                            </select>
+                                        </td>
+                                        <td style="width: 20%">
+                                            <select onchange="setPrice(this,0)"
+                                                class="form-control select2 select-group select-group-0"
+                                                style="width: 100%;" name="order_details[0][group_id]">
                                                 <option value='0'>Pilih Jenis Corak</option>
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" name="group_product[0][qty]"
-                                                placeholder="Masukan Kuantitas" class="form-control">
-
+                                            <input type="number" name="order_details[0][price]" id="price-0"
+                                                class="form-control" readonly>
                                         </td>
                                         <td>
-                                            <input type="number" name="group_product[0][price]" placeholder="Masukan Harga"
-                                                class="form-control">
+                                            <input type="number" name="order_details[0][qty]" class="form-control"
+                                                placeholder="Masukan qty barang">
+                                        </td>
+                                        <td>
+                                            <input type="number" name="order_details[0][total]" class="form-control">
                                         </td>
                                         <td>
                                             <button type="button" name="add" id="add"
-                                                class="btn btn-primary">Tambah Lagi</button>
+                                                class="btn btn-primary">+</button>
                                         </td>
                                     </tr>
-                                </table> --}}
+                                </table>
 
                             </div>
                             <div class="modal-footer justify-content-between">
                                 <button type="button" class="btn btn-danger" data-dismiss="modal">Kembali</button>
-                                <button type="submit" id="saveBtn" class="btn btn-success" value="create">Simpan</button>
+                                <button type="submit" id="saveBtn" class="btn btn-success"
+                                    value="create">Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -221,7 +233,7 @@
 
 
     <script type="text/javascript">
-        // var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         // var i = 0;
         // let indexAddEditRowDetail = 0;
 
@@ -337,6 +349,62 @@
         //     });
         // }
 
+        function select2Product(index) {
+            $(`.select-product`).select2({
+                theme: 'bootstrap4',
+                ajax: {
+                    url: "{{ route('products.select-products') }}",
+                    type: "post",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            _token: CSRF_TOKEN,
+                            search: params.term // search term
+                        };
+                    },
+                    processResults: function(response) {
+                        return {
+                            results: response
+                        };
+                    },
+                    cache: true
+                }
+            });
+        }
+
+
+        function setPrice(e, index) {
+            const group_id = e.value;
+            const product_id = $(`.select-product-${index}`).val();
+            console.log(group_id)
+            console.log(product_id)
+
+            $.ajax({
+                type: "POST",
+                url: "{{ route('groups.price') }}",
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        _token: CSRF_TOKEN, // search term
+                        product_id: product_id,
+                        group_id: group_id
+                    };
+                },
+                processResults: function(response) {
+                    console.log('cek price bro')
+                    console.log(response)
+                    // console.log('response => ', response)
+                    // return {
+                    //     results: response
+                    // };
+                },
+                // cache: true
+            });
+            // $('#price-0').val("");
+        }
+
+
         $(function() {
             $.ajaxSetup({
                 headers: {
@@ -391,7 +459,7 @@
                 ]
             });
 
-            //Search Types
+            //Search Sales
             $("#select-sales").select2({
                 theme: 'bootstrap4',
                 ajax: {
@@ -415,56 +483,104 @@
                 }
             });
 
-            // select2(0);
+
+            $('.select-product').on('change', function(e, index = 0) {
+                let product_id = this.value;
+
+                $(`.select-group-${index}`).prop('disabled', false);
+
+                //Remove Option Select Type
+                $(`.select-group-${index}`)
+                    .find('option')
+                    .remove()
+                    .end();
+
+                $(`.select-group-${index}`).append(
+                    `<option value='' disabled selected>Pilih Jenis Corak</option>`);
+
+                $(`.select-group-${index}`).val("");
+
+                $(`.select-group-${index}`).select2({
+                    theme: 'bootstrap4',
+                    ajax: {
+                        url: "{{ route('groups.select-groups') }}",
+                        type: "post",
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                _token: CSRF_TOKEN,
+                                search: params.term, // search term
+                                product_id: product_id
+                            };
+                        },
+                        processResults: function(response) {
+                            console.log('response => ', response)
+                            return {
+                                results: response
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            });
+
+            $('.select-product').on('change', function(e, index = 0) {
+                let product_id = this.value;
+
+                $(`.select-group-${index}`).prop('disabled', false);
+
+                //Remove Option Select Type
+                $(`.select-group-${index}`)
+                    .find('option')
+                    .remove()
+                    .end();
+
+                $(`.select-group-${index}`).append(
+                    `<option value='' disabled selected>Pilih Jenis Corak</option>`);
+
+                $(`.select-group-${index}`).val("");
+
+                $(`.select-group-${index}`).select2({
+                    theme: 'bootstrap4',
+                    ajax: {
+                        url: "{{ route('groups.select-groups') }}",
+                        type: "post",
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                _token: CSRF_TOKEN,
+                                search: params.term, // search term
+                                product_id: product_id
+                            };
+                        },
+                        processResults: function(response) {
+                            console.log('response => ', response)
+                            return {
+                                results: response
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            });
+
 
 
             //BUTTON TAMBAH BARANG
             $('#createNew').click(function() {
-                // indexAddEditRowDetail = 0;
-                // $('.table-group-product').remove();
-
-                // $("#dynamicTable").append(`<tr class="tr-body-${indexAddEditRowDetail} table-group-product">
-            //         <td style="width: 30%">
-            //             <select class="form-control select2 select-groups select-groups-${indexAddEditRowDetail}" style="width: 100%;"
-            //                 name="group_product[${indexAddEditRowDetail}][group_id]">
-            //                 <option value='0'>Pilih Jenis Corak</option>
-            //             </select>
-            //         </td>
-            //         <td>
-            //             <input type="number" name="group_product[${indexAddEditRowDetail}][qty]" placeholder="Masukan Kuantitas"
-            //                 class="form-control">
-
-            //         </td>
-            //         <td>
-            //             <input type="number" name="group_product[${indexAddEditRowDetail}][price]" placeholder="Masukan Harga"
-            //                 class="form-control">
-            //         </td>
-            //         <td>
-            //             <button type="button" onclick=addRowDetail(${indexAddEditRowDetail},'NEW') name="addDetail" id="addDetail"
-            //                 class="btn btn-primary">Tambah Lagi</button>
-            //         </td>
-            //     </tr>`
-                // );
-
-                // //Remove Option Select Type
-                // $('#select-types')
-                //     .find('option')
-                //     .remove()
-                //     .end();
-
-                // $('#select-types').append(
-                //     `<option value='' disabled selected>Pilih Tipe</option>`);
-
-                // select2(0);
-
-                // //Remove validation class
-                // $('.is-invalid').removeClass("is-invalid");
-                // $('span.error').remove();
-
-
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('orders.code') }}",
+                    success: function(data) {
+                        $('#code').val(data.data);
+                    }
+                });
 
                 $('#saveBtn').val("create-orders");
                 $('#order_id').val("");
+
                 $('#sale_id').val("");
                 $('#modelHeading').html("Membuat Penjualan Baru");
                 $('#orderForm').trigger("reset");
@@ -473,7 +589,9 @@
                     keyboard: false
                 });
 
-            })
+                select2Product(0);
+
+            });
 
             $('body').on('click', '.checkStockProduct', function() {
                 $('.tr-quantities').remove();

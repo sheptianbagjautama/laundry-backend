@@ -160,9 +160,28 @@ class GroupController extends Controller
         foreach ($groups as $group) {
             $response[] = array(
                 "id" => $group->group->id,
-                "text" => $group->group->name
+                "text" => $group->group->name,
+                "price" => $group->price
             );
         }
         return response()->json($response);
+    }
+
+    public function setPrice(Request $request)
+    {
+        $product_id = $request->product_id;
+        $group_id = $request->group_id;
+
+
+        $groups = GroupProduct::with(['product', 'group'])
+            ->where('product_id', $product_id)
+            ->where('group_id', $group_id)
+            ->get();
+
+
+        return response()->json([
+            'isError' => false,
+            'data' => $groups
+        ]);
     }
 }

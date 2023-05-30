@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -92,4 +93,39 @@ class OrderController extends Controller
     {
         //
     }
+
+    public function code()
+    {
+        $code = DB::select('SELECT IFNULL(MAX(id),0) + 1 AS nextCode FROM orders');
+        $result = "ORD-00" . $code[0]->nextCode;
+        return response()->json([
+            "data" => $result
+        ]);
+    }
+
+    public function testing()
+    {
+        return 'Whyyy';
+    }
+
+    // public function generateUniqueCode()
+    // {
+    //     $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    //     $charactersNumber = strlen($characters);
+    //     $codeLength = 6;
+
+    //     $code = '';
+
+    //     while (strlen($code) < 6) {
+    //         $position = rand(0, $charactersNumber - 1);
+    //         $character = $characters[$position];
+    //         $code = $code . $character;
+    //     }
+
+    //     if (Order::where('code', $code)->exists()) {
+    //         $this->generateUniqueCode();
+    //     }
+
+    //     return $code;
+    // }
 }
