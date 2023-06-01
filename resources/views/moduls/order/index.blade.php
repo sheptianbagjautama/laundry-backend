@@ -130,13 +130,14 @@
                                     </tr>
                                     <tr class="tr-body-0 table-group-product">
                                         <td style="width: 20%">
-                                            <select class="form-control select2 select-product select-product-0"
+                                            <select onchange="setProduct(this, 0)"
+                                                class="form-control select2 select-product select-product-0"
                                                 style="width: 100%;" name="order_details[0][product_id]">
                                                 <option value='0'>Pilih Barang</option>
                                             </select>
                                         </td>
                                         <td style="width: 20%">
-                                            <select onchange="setPrice(this,0)"
+                                            <select onchange="setPrice(this,0)" id="select-group-0"
                                                 class="form-control select2 select-group select-group-0"
                                                 style="width: 100%;" name="order_details[0][group_id]">
                                                 <option value='0'>Pilih Jenis Corak</option>
@@ -148,7 +149,7 @@
                                         </td>
                                         <td>
                                             <input type="number" onkeyup="setTotal(this,0)" name="order_details[0][qty]"
-                                                class="form-control" placeholder="Masukan qty barang">
+                                                class="form-control" placeholder="Masukan qty barang" id="qty-0">
                                         </td>
                                         <td>
                                             <input type="number" name="order_details[0][total]" id="total-0"
@@ -235,26 +236,26 @@
 
     <script type="text/javascript">
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        // var i = 0;
+        var i = 0;
         // let indexAddEditRowDetail = 0;
 
-        // /* Fungsi formatRupiah */
-        // let formatRupiah = (angka, prefix) => {
-        //     var number_string = angka.replace(/[^,\d]/g, '').toString(),
-        //         split = number_string.split(','),
-        //         sisa = split[0].length % 3,
-        //         rupiah = split[0].substr(0, sisa),
-        //         ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+        /* Fungsi formatRupiah */
+        let formatRupiah = (angka, prefix) => {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-        //     // tambahkan titik jika yang di input sudah menjadi angka ribuan
-        //     if (ribuan) {
-        //         separator = sisa ? '.' : '';
-        //         rupiah += separator + ribuan.join('.');
-        //     }
+            // tambahkan titik jika yang di input sudah menjadi angka ribuan
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
 
-        //     rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-        //     return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
-        // }
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        }
 
         // let addRowDetail = (i, type = null) => {
         //     if (type == "NEW") {
@@ -294,61 +295,93 @@
         //     select2(i);
         // }
 
-        // $("#add").click(function() {
-        //     ++i;
+        $("#add").click(function() {
+            ++i;
 
-        //     $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
-    //     <td style="width: 30%">
-    //         <select  class="form-control select2 select-groups select-groups-${i}" style="width: 100%;"
-    //             name="group_product[${i}][group_id]">
-    //             <option value='0'>Pilih Jenis Corak</option>
-    //         </select>
-    //     </td>
-    //     <td>
-    //         <input type="number" name="group_product[${i}][qty]" placeholder="Masukan Kuantitas"
-    //             class="form-control">
+            $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
+                <td style="width: 20%">
+                    <select onchange="setProduct(this, ${i})"
+                        class="form-control select2 select-product select-product-${i}"
+                        style="width: 100%;" name="order_details[${i}][product_id]">
+                        <option value='0'>Pilih Barang</option>
+                    </select>
+                </td>
+                <td style="width: 20%">
+                    <select onchange="setPrice(this,${i})" id="select-group-${i}"
+                        class="form-control select2 select-group select-group-${i}"
+                        style="width: 100%;" name="order_details[${i}][group_id]">
+                        <option value='0'>Pilih Jenis Corak</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="order_details[${i}][price]" id="price-${i}"
+                        class="form-control" readonly>
+                </td>
+                <td>
+                    <input type="number" onkeyup="setTotal(this,${i})" name="order_details[${i}][qty]"
+                        class="form-control" placeholder="Masukan qty barang" id="qty-${i}">
+                </td>
+                <td>
+                    <input type="number" name="order_details[${i}][total]" id="total-${i}"
+                        class="form-control" readonly>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-tr">Remove</button>
+                </td>
+            </tr>`);
 
-    //     </td>
-    //     <td>
-    //         <input type="number" name="group_product[${i}][price]" placeholder="Masukan Harga"
-    //             class="form-control">
-    //     </td>
-    //     <td>
-    //         <button type="button" class="btn btn-danger remove-tr">Remove</button>
-    //     </td>
-    // </tr>`)
-
-        //     select2(i);
-        // });
+            select2Product(i);
+        });
 
 
-        // $(document).on('click', '.remove-tr', function() {
-        //     $(this).parents('tr').remove();
-        // })
+        $(document).on('click', '.remove-tr', function() {
+            $(this).parents('tr').remove();
+        })
 
-        // function select2(index) {
-        //     $(`.select-groups`).select2({
-        //         theme: 'bootstrap4',
-        //         ajax: {
-        //             url: "{{ route('groups.select') }}",
-        //             type: "post",
-        //             dataType: 'json',
-        //             delay: 250,
-        //             data: function(params) {
-        //                 return {
-        //                     _token: CSRF_TOKEN,
-        //                     search: params.term // search term
-        //                 };
-        //             },
-        //             processResults: function(response) {
-        //                 return {
-        //                     results: response
-        //                 };
-        //             },
-        //             cache: true
-        //         }
-        //     });
-        // }
+        function setProduct(e, index) {
+            let product_id = e.value;
+
+            $(`.select-group-${index}`).prop('disabled', false);
+
+            //Remove Option Select Type
+            $(`.select-group-${index}`)
+                .find('option')
+                .remove()
+                .end();
+
+            $(`.select-group-${index}`).append(
+                `<option value='' disabled selected>Pilih Jenis Corak</option>`);
+
+            $(`.select-group-${index}`).val("");
+
+            $(`.select-group-${index}`).select2({
+                theme: 'bootstrap4',
+                ajax: {
+                    url: "{{ route('groups.select-groups') }}",
+                    type: "post",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            _token: CSRF_TOKEN,
+                            search: params.term, // search term
+                            product_id: product_id
+                        };
+                    },
+                    processResults: function(response) {
+                        console.log('response => ', response)
+                        return {
+                            results: response
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $(`#price-${index}`).val("");
+            $(`#qty-${index}`).val("");
+            $(`#total-${index}`).val("");
+        }
 
         function select2Product(index) {
             console.log('masuk ke select product');
@@ -399,38 +432,8 @@
 
             $.get("{{ route('groups.index') }}" + '/' + product_id + '/' + group_id + '/price', function(data) {
                 console.log('bismillah => ', data)
-                $(`#price-0`).val(data.data);
+                $(`#price-${index}`).val(data.data);
             })
-
-            // $.ajax({
-            //     type: "POST",
-            //     url: "{{ route('groups.price') }}",
-            //     dataType: 'json',
-            //     data: function(params) {
-            //         console.log("params => ", params)
-            //         console.log('product_id', product_id)
-            //         console.log('group_id', group_id)
-            //         return {
-            //             _token: CSRF_TOKEN, // search term
-            //             product_id: product_id,
-            //             group_id: group_id
-            //         };
-            //     },
-            //     success: function(data) {
-            //         console.log(data)
-            //         // $('#code').val(data.data);
-            //     }
-            //     // processResults: function(response) {
-            //     //     console.log('cek price bro')
-            //     //     console.log(response)
-            //     //     // console.log('response => ', response)
-            //     //     // return {
-            //     //     //     results: response
-            //     //     // };
-            //     // },
-            //     // cache: true
-            // });
-            // // $('#price-0').val("");
         }
 
 
@@ -512,50 +515,6 @@
                 }
             });
 
-
-            $('.select-product').on('change', function(e, index = 0) {
-                let product_id = this.value;
-
-                $(`.select-group-${index}`).prop('disabled', false);
-
-                //Remove Option Select Type
-                $(`.select-group-${index}`)
-                    .find('option')
-                    .remove()
-                    .end();
-
-                $(`.select-group-${index}`).append(
-                    `<option value='' disabled selected>Pilih Jenis Corak</option>`);
-
-                $(`.select-group-${index}`).val("");
-
-                $(`.select-group-${index}`).select2({
-                    theme: 'bootstrap4',
-                    ajax: {
-                        url: "{{ route('groups.select-groups') }}",
-                        type: "post",
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return {
-                                _token: CSRF_TOKEN,
-                                search: params.term, // search term
-                                product_id: product_id
-                            };
-                        },
-                        processResults: function(response) {
-                            console.log('response => ', response)
-                            return {
-                                results: response
-                            };
-                        },
-                        cache: true
-                    }
-                });
-            });
-
-
-
             //BUTTON TAMBAH BARANG
             $('#createNew').click(function() {
                 $.ajax({
@@ -579,34 +538,6 @@
 
                 select2Product(0);
 
-            });
-
-            $('body').on('click', '.checkStockProduct', function() {
-                $('.tr-quantities').remove();
-                var order_id = $(this).data('id');
-                $.get("{{ route('products.index') }}" + '/' + order_id + '/quantities', function(data) {
-                    const groups = data.data.groups;
-                    let i = 1;
-
-                    groups.forEach(detail => {
-                        $("#table-body-quantities").append(`
-                    <tr class="tr-quantities">
-                        <td>${i}</td>
-                        <td>${detail.name}</td>
-                        <td>
-                            ${detail.pivot.qty}
-                        </td>
-                        <td>
-                            ${formatRupiah(detail.pivot.price.toString(), 'Rp. ')}</td>
-                    </tr>
-                `);
-
-                        i++;
-                    });
-                });
-
-
-                $('#checkStock').modal('show');
             });
 
             //BUTTON EDIT BARANG
@@ -690,84 +621,97 @@
 
 
             //BUAT ATAU UBAH BARANG
-            // $.validator.setDefaults({
-            //     submitHandler: function() {
-            //         let isCreate = $('#orderForm').serialize();
-            //         $.ajax({
-            //             data: $('#orderForm').serialize(),
-            //             url: "{{ route('products.store') }}",
-            //             type: "POST",
-            //             dataType: "json",
-            //             success: function(data) {
+            $.validator.setDefaults({
+                submitHandler: function() {
+                    let isCreate = $('#orderForm').serialize();
+                    $.ajax({
+                        data: $('#orderForm').serialize(),
+                        url: "{{ route('orders.store') }}",
+                        type: "POST",
+                        dataType: "json",
+                        success: function(data) {
+                            console.log('response data => ', data)
+                            if (data.isError == false) {
+                                $('#orderForm').trigger("reset");
+                                $('#ajaxModel').modal('hide');
 
-            //                 if (data.isError == false) {
-            //                     $('#orderForm').trigger("reset");
-            //                     $('#ajaxModel').modal('hide');
-
-            //                     let isCreate = $('#orderForm').serialize();
-
-            //                     if (isCreate.includes('order_id=&')) {
-            //                         Swal.fire(
-            //                             'Sukses!',
-            //                             'Berhasil menyimpan barang',
-            //                             'success'
-            //                         )
-            //                     } else {
-            //                         Swal.fire(
-            //                             'Sukses!',
-            //                             'Berhasil mengubah barang',
-            //                             'success'
-            //                         )
-            //                     }
+                                let isCreate = $('#orderForm').serialize();
 
 
-            //                     table.draw();
-            //                 } else {
-            //                     Swal.fire(
-            //                         'Gagal!',
-            //                         data.message,
-            //                         'error'
-            //                     )
-            //                 }
+                                // if (isCreate.includes('order_id=&')) {
+                                //     Swal.fire(
+                                //         'Sukses!',
+                                //         'Berhasil menyimpan barang',
+                                //         'success'
+                                //     )
+                                // } else {
+                                //     Swal.fire(
+                                //         'Sukses!',
+                                //         'Berhasil mengubah barang',
+                                //         'success'
+                                //     )
+                                // }
 
-            //             },
-            //             error: function(data) {
-            //                 console.log('Error: ', data);
-            //                 $('#saveBtn').html("Simpan Perubahan");
-            //             }
-            //         });
-            //     }
-            // });
 
-            // $('#orderForm').validate({
-            //     rules: {
-            //         name: {
-            //             required: true,
-            //         },
-            //         type_id: {
-            //             required: true,
-            //         },
-            //     },
-            //     messages: {
-            //         name: {
-            //             required: "Silahkan masukan nama barang",
-            //         },
-            //         type_id: {
-            //             requi$red: "Silahkan masukan tipe barang",
-            //         },
-            //     },
-            //     errorElement: 'span',
-            //     errorPlacement: function(error, element) {
-            //         error.addClass('invalid-feedback');
-            //         element.closest('.form-group').append(error);
-            //     },
-            //     highlight: function(element, errorClass, validClass) {
-            //         $(element).addClass('is-invalid');
-            //     },
-            //     unhighlight: function(element, errorClass, validClass) {
-            //         $(element).removeClass('is-invalid');
-            //     }
-            // });
+                                // table.draw();
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    data.message,
+                                    'error'
+                                )
+                            }
+
+                        },
+                        error: function(data) {
+                            console.log('Error: ', data);
+                            $('#saveBtn').html("Simpan Perubahan");
+                        }
+                    });
+                }
+            });
+
+            $('#orderForm').validate({
+                rules: {
+                    sale_id: {
+                        required: true,
+                    },
+                    customer_name: {
+                        required: true,
+                    },
+                    customer_phone: {
+                        required: true,
+                    },
+                    customer_address: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    sale_id: {
+                        required: "Silahkan masukan nama sales",
+                    },
+                    customer_name: {
+                        required: "Silahkan masukan nama pelanggan",
+                    },
+                    customer_phone: {
+                        required: "Silahkan masukan telepon pelanggan",
+                    },
+                    customer_address: {
+                        required: "Silahkan masukan alamat pelanggan",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
 
             /*------------------------------------------
                 --------------------------------------------
