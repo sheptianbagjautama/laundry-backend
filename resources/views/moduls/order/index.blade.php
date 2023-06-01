@@ -147,11 +147,12 @@
                                                 class="form-control" readonly>
                                         </td>
                                         <td>
-                                            <input type="number" name="order_details[0][qty]" class="form-control"
-                                                placeholder="Masukan qty barang">
+                                            <input type="number" onkeyup="setTotal(this,0)" name="order_details[0][qty]"
+                                                class="form-control" placeholder="Masukan qty barang">
                                         </td>
                                         <td>
-                                            <input type="number" name="order_details[0][total]" class="form-control">
+                                            <input type="number" name="order_details[0][total]" id="total-0"
+                                                class="form-control" readonly>
                                         </td>
                                         <td>
                                             <button type="button" name="add" id="add"
@@ -374,6 +375,19 @@
             });
         }
 
+        function setTotal(e, index) {
+            console.log('masuk ke set total')
+            const price = $(`#price-${index}`).val();
+            const qty = e.value == '' ? 0 : e.value;
+
+            console.log('price ==> ', price)
+            console.log('qty ==> ', qty)
+
+            const result = price * qty;
+
+            console.log('result ==> ', result)
+            $(`#total-${index}`).val(result);
+        }
 
         function setPrice(e, index) {
             console.log('masuk ke set price');
@@ -382,35 +396,41 @@
             console.log(group_id)
             console.log(product_id)
 
-            $.ajax({
-                type: "POST",
-                url: "{{ route('groups.price') }}",
-                dataType: 'json',
-                data: function(params) {
-                    console.log("params => ", params)
-                    console.log('product_id', product_id)
-                    console.log('group_id', group_id)
-                    return {
-                        _token: CSRF_TOKEN, // search term
-                        product_id: product_id,
-                        group_id: group_id
-                    };
-                },
-                success: function(data) {
-                    console.log(data)
-                    // $('#code').val(data.data);
-                }
-                // processResults: function(response) {
-                //     console.log('cek price bro')
-                //     console.log(response)
-                //     // console.log('response => ', response)
-                //     // return {
-                //     //     results: response
-                //     // };
-                // },
-                // cache: true
-            });
-            // $('#price-0').val("");
+
+            $.get("{{ route('groups.index') }}" + '/' + product_id + '/' + group_id + '/price', function(data) {
+                console.log('bismillah => ', data)
+                $(`#price-0`).val(data.data);
+            })
+
+            // $.ajax({
+            //     type: "POST",
+            //     url: "{{ route('groups.price') }}",
+            //     dataType: 'json',
+            //     data: function(params) {
+            //         console.log("params => ", params)
+            //         console.log('product_id', product_id)
+            //         console.log('group_id', group_id)
+            //         return {
+            //             _token: CSRF_TOKEN, // search term
+            //             product_id: product_id,
+            //             group_id: group_id
+            //         };
+            //     },
+            //     success: function(data) {
+            //         console.log(data)
+            //         // $('#code').val(data.data);
+            //     }
+            //     // processResults: function(response) {
+            //     //     console.log('cek price bro')
+            //     //     console.log(response)
+            //     //     // console.log('response => ', response)
+            //     //     // return {
+            //     //     //     results: response
+            //     //     // };
+            //     // },
+            //     // cache: true
+            // });
+            // // $('#price-0').val("");
         }
 
 

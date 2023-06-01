@@ -64,6 +64,7 @@ Route::middleware(['auth', 'user-access:manager'])->group(function () {
 
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('groups/{product_id}/{group_id}/price', [GroupController::class, 'setPrice2'])->name('groups.price2');
     Route::get('groups/list', [GroupController::class, 'getGroups'])->name('groups.list');
     Route::get('groups', [GroupController::class, 'index'])->name('groups.index');
     Route::post('groups', [GroupController::class, 'store'])->name('groups.store');
@@ -72,6 +73,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('getSearchGroups', [GroupController::class, 'getSearchGroups'])->name('groups.select');
     Route::post('groups/select-groups', [GroupController::class, 'getSelectGroups'])->name('groups.select-groups');
     Route::post('groups/price', [GroupController::class, 'setPrice'])->name('groups.price');
+
 
     Route::get('types/list', [TypeController::class, 'getTypes'])->name('types.list');
     Route::resource('types', TypeController::class);

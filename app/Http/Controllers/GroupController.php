@@ -190,4 +190,18 @@ class GroupController extends Controller
             'data' => $groups
         ]);
     }
+
+    public function setPrice2($product_id, $group_id)
+    {
+        $groups = GroupProduct::with(['product', 'group'])
+            ->where('product_id', $product_id)
+            ->where('group_id', $group_id)
+            ->get();
+
+
+        return response()->json([
+            'isError' => false,
+            'data' => $groups[0]->price
+        ]);
+    }
 }
