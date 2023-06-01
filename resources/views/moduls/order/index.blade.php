@@ -350,6 +350,7 @@
         // }
 
         function select2Product(index) {
+            console.log('masuk ke select product');
             $(`.select-product`).select2({
                 theme: 'bootstrap4',
                 ajax: {
@@ -375,6 +376,7 @@
 
 
         function setPrice(e, index) {
+            console.log('masuk ke set price');
             const group_id = e.value;
             const product_id = $(`.select-product-${index}`).val();
             console.log(group_id)
@@ -385,20 +387,27 @@
                 url: "{{ route('groups.price') }}",
                 dataType: 'json',
                 data: function(params) {
+                    console.log("params => ", params)
+                    console.log('product_id', product_id)
+                    console.log('group_id', group_id)
                     return {
                         _token: CSRF_TOKEN, // search term
                         product_id: product_id,
                         group_id: group_id
                     };
                 },
-                processResults: function(response) {
-                    console.log('cek price bro')
-                    console.log(response)
-                    // console.log('response => ', response)
-                    // return {
-                    //     results: response
-                    // };
-                },
+                success: function(data) {
+                    console.log(data)
+                    // $('#code').val(data.data);
+                }
+                // processResults: function(response) {
+                //     console.log('cek price bro')
+                //     console.log(response)
+                //     // console.log('response => ', response)
+                //     // return {
+                //     //     results: response
+                //     // };
+                // },
                 // cache: true
             });
             // $('#price-0').val("");
@@ -483,47 +492,6 @@
                 }
             });
 
-
-            $('.select-product').on('change', function(e, index = 0) {
-                let product_id = this.value;
-
-                $(`.select-group-${index}`).prop('disabled', false);
-
-                //Remove Option Select Type
-                $(`.select-group-${index}`)
-                    .find('option')
-                    .remove()
-                    .end();
-
-                $(`.select-group-${index}`).append(
-                    `<option value='' disabled selected>Pilih Jenis Corak</option>`);
-
-                $(`.select-group-${index}`).val("");
-
-                $(`.select-group-${index}`).select2({
-                    theme: 'bootstrap4',
-                    ajax: {
-                        url: "{{ route('groups.select-groups') }}",
-                        type: "post",
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return {
-                                _token: CSRF_TOKEN,
-                                search: params.term, // search term
-                                product_id: product_id
-                            };
-                        },
-                        processResults: function(response) {
-                            console.log('response => ', response)
-                            return {
-                                results: response
-                            };
-                        },
-                        cache: true
-                    }
-                });
-            });
 
             $('.select-product').on('change', function(e, index = 0) {
                 let product_id = this.value;

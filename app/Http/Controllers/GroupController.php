@@ -172,10 +172,16 @@ class GroupController extends Controller
         $product_id = $request->product_id;
         $group_id = $request->group_id;
 
+        return response()->json([
+            'isError' => false,
+            'product_id' => $product_id,
+            'group_id' => $group_id,
+        ]);
+
 
         $groups = GroupProduct::with(['product', 'group'])
             ->where('product_id', $product_id)
-            ->where('group_id', $group_id)
+            ->orWhere('group_id', $group_id)
             ->get();
 
 
