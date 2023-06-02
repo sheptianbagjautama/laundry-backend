@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('customer_name');
             $table->text('customer_address');
             $table->string('customer_phone');
-            $table->bigInteger('total_price');
-            $table->integer('total_qty');
+            $table->bigInteger('total_price')->nullable();
+            $table->integer('total_qty')->nullable();
             $table->timestamps();
         });
     }

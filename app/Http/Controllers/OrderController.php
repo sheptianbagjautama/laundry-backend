@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderDetail;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\DB;
@@ -59,9 +60,72 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        $order_details = $request->order_details;
+
+        if (count($order_details) < 1) {
+            return response()->json([
+                'isError' => true,
+                'data' => $request->all(),
+                'message' => 'penjualan minimal mempunyai 1 penjualan detail, silahkan isi terlebih dahulu.'
+            ]);
+        }
+
+        foreach ($order_details as $key => $od) {
+            if ($od['product_id'] == 0) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada barang yang belum dipilih, silahkan pilih terlebih dahulu.'
+                ]);
+            }
+
+            if ($od['group_id'] == 0) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada jenis corak barang yang belum dipilih, silahkan pilih terlebih dahulu.'
+                ]);
+            }
+
+            if ($od['qty'] == null) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada qty yang belum diisi, silahkan isi terlebih dahulu.'
+                ]);
+            }
+
+            if ($od['total'] == null) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada total yang belum diisi, silahkan isi terlebih dahulu.'
+                ]);
+            }
+        }
+
+
+        $order = Order::create($request->all());
+
+        $total_price = 0;
+        $qty = 0;
+
+        foreach ($order_details as $key => $od) {
+            $od['order_id'] = $order->id;
+            $od['code'] = $this->generateCode();
+            OrderDetail::create($od);
+            $total_price += $od['total'];
+            $qty += $od['qty'];
+        }
+
+        $order->total_price = $total_price;
+        $order->total_qty = $qty;
+        $order->save();
+
         return response()->json([
             'isError' => false,
-            'data' => $request->all()
+            'data' => $request->all(),
+            'message' => 'Berhasil menyimpan penjualan'
         ]);
     }
 
@@ -109,6 +173,13 @@ class OrderController extends Controller
     public function testing()
     {
         return 'Whyyy';
+    }
+
+    private function generateCode()
+    {
+        $code = DB::select('SELECT IFNULL(MAX(id),0) + 1 AS nextCode FROM order_details');
+        $result = "ORDT-00" . $code[0]->nextCode;
+        return $result;
     }
 
     // public function generateUniqueCode()

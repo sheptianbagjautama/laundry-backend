@@ -624,50 +624,51 @@
             $.validator.setDefaults({
                 submitHandler: function() {
                     let isCreate = $('#orderForm').serialize();
-                    $.ajax({
-                        data: $('#orderForm').serialize(),
-                        url: "{{ route('orders.store') }}",
-                        type: "POST",
-                        dataType: "json",
-                        success: function(data) {
-                            console.log('response data => ', data)
-                            if (data.isError == false) {
-                                $('#orderForm').trigger("reset");
-                                $('#ajaxModel').modal('hide');
 
-                                let isCreate = $('#orderForm').serialize();
+                    if (isCreate.includes('order_id=&')) {
 
-
-                                // if (isCreate.includes('order_id=&')) {
-                                //     Swal.fire(
-                                //         'Sukses!',
-                                //         'Berhasil menyimpan barang',
-                                //         'success'
-                                //     )
-                                // } else {
-                                //     Swal.fire(
-                                //         'Sukses!',
-                                //         'Berhasil mengubah barang',
-                                //         'success'
-                                //     )
-                                // }
+                        $.ajax({
+                            data: $('#orderForm').serialize(),
+                            url: "{{ route('orders.store') }}",
+                            type: "POST",
+                            dataType: "json",
+                            success: function(data) {
+                                console.log('response data => ', data)
+                                if (data.isError == false) {
+                                    $('#orderForm').trigger("reset");
+                                    $('#ajaxModel').modal('hide');
 
 
-                                // table.draw();
-                            } else {
-                                Swal.fire(
-                                    'Gagal!',
-                                    data.message,
-                                    'error'
-                                )
+                                    Swal.fire(
+                                        'Sukses!',
+                                        'Berhasil menyimpan barang',
+                                        'success'
+                                    )
+
+                                    table.draw();
+                                } else {
+                                    Swal.fire(
+                                        'Gagal!',
+                                        data.message,
+                                        'error'
+                                    )
+                                }
+
+                            },
+                            error: function(data) {
+                                console.log('Error: ', data);
+                                $('#saveBtn').html("Simpan Perubahan");
                             }
+                        });
+                    } else {
+                        Swal.fire(
+                            'Sukses!',
+                            'Berhasil mengubah barang',
+                            'success'
+                        )
+                    }
 
-                        },
-                        error: function(data) {
-                            console.log('Error: ', data);
-                            $('#saveBtn').html("Simpan Perubahan");
-                        }
-                    });
+
                 }
             });
 
