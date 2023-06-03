@@ -149,9 +149,93 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        // return response()->json([
+        //     'isError' => false,
+        //     'data' => $request->all(),
+        //     'message' => 'Berhasil mengubah penjualan'
+        // ]);
+
+        $order_details = $request->order_details;
+
+        if (count($order_details) < 1) {
+            return response()->json([
+                'isError' => true,
+                'data' => $request->all(),
+                'message' => 'penjualan minimal mempunyai 1 penjualan detail, silahkan isi terlebih dahulu.'
+            ]);
+        }
+
+        foreach ($order_details as $key => $od) {
+            if ($od['product_id'] == 0) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada barang yang belum dipilih, silahkan pilih terlebih dahulu.'
+                ]);
+            }
+
+            if ($od['group_id'] == 0) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada jenis corak barang yang belum dipilih, silahkan pilih terlebih dahulu.'
+                ]);
+            }
+
+            if ($od['qty'] == null) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada qty yang belum diisi, silahkan isi terlebih dahulu.'
+                ]);
+            }
+
+            if ($od['total'] == null) {
+                return response()->json([
+                    'isError' => true,
+                    'data' => $request->all(),
+                    'message' => 'Ada total yang belum diisi, silahkan isi terlebih dahulu.'
+                ]);
+            }
+        }
+
+        $order = Order::findOrFail($request->order_id);
+        $order->update($request->all());
+
+        $total_price = 0;
+        $total_qty = 0;
+
+        // return response()->json([
+        //     'isError' => false,
+        //     'data' => $order_details,
+        //     'message' => 'Berhasil mengubah penjualan'
+        // ]);
+
+        foreach ($order_details as $key => $od) {
+            if ($od['id'] != null) {
+                $orderDetail = OrderDetail::findOrFail($od['id']);
+                $orderDetail->update($od);
+            } else {
+                $od['order_id'] = $order->id;
+                $od['code'] = $this->generateCode();
+                OrderDetail::create($od);
+            }
+            $total_price += $od['total'];
+            $total_qty += $od['qty'];
+        }
+
+        // $order_update = Order::findOrFail($request->order_id);
+        $order->total_price = $total_price;
+        $order->total_qty = $total_qty;
+        $order->save();
+
+        return response()->json([
+            'isError' => false,
+            'data' => $request->all(),
+            'message' => 'Berhasil mengubah penjualan'
+        ]);
     }
 
     /**
@@ -159,7 +243,19 @@ class OrderController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $order = Order::with(['sale', 'orderdetails'])->findOrFail($id);
+
+        foreach ($order->orderdetails as $key => $od) {
+            $order_detail = OrderDetail::findOrFail($od['id']);
+            $order_detail->delete();
+        }
+
+        $order->delete();
+
+        return response()->json([
+            'isError' => false,
+            'message' => "Berhasil menghapus penjualan"
+        ]);
     }
 
     public function code()

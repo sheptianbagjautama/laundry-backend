@@ -264,6 +264,7 @@
 
             $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
                 <td style="width: 20%">
+                    <input type="hidden" name="order_details[${indexAddEditRowDetail}][id]" value="">
                     <select onchange="setProduct(this, ${i})"
                         class="form-control select2 select-product select-product-${i}"
                         style="width: 100%;" name="order_details[${i}][product_id]">
@@ -393,6 +394,7 @@
             $("#dynamicTable").append(`
                 <tr class="tr-body-${indexAddEditRowDetail} table-group-product">
                     <td style="width: 20%">
+                        <input type="hidden" name="order_details[${indexAddEditRowDetail}][id]" value="">
                         <select onchange="setProduct(this, ${indexAddEditRowDetail})"
                             class="form-control select2 select-product select-product-${indexAddEditRowDetail}"
                             style="width: 100%;" name="order_details[${indexAddEditRowDetail}][product_id]">
@@ -541,6 +543,7 @@
 
                 $("#dynamicTable").append(`<tr class="tr-body-${indexAddEditRowDetail} table-group-product">
                 <td style="width: 20%">
+                    <input type="hidden" name="order_details[${indexAddEditRowDetail}][id]" value="">
                     <select onchange="setProduct(this, ${indexAddEditRowDetail})"
                         class="form-control select2 select-product select-product-${indexAddEditRowDetail}"
                         style="width: 100%;" name="order_details[${indexAddEditRowDetail}][product_id]">
@@ -651,6 +654,7 @@
                             $("#dynamicTable").append(`
                                 <tr class="tr-body-${i} table-group-product">
                                     <td style="width: 20%">
+                                        <input type="hidden" name="order_details[${indexAddEditRowDetail}][id]" value=${detail.id}>
                                         <select onchange="setProduct(this, ${i})"
                                             class="form-control select2 select-product select-product-${i}"
                                             style="width: 100%;" name="order_details[${i}][product_id]">
@@ -686,6 +690,7 @@
                             $("#dynamicTable").append(`
                                 <tr class="tr-body-${i} table-group-product">
                                     <td style="width: 20%">
+                                        <input type="hidden" name="order_details[${indexAddEditRowDetail}][id]" value=${detail.id}>
                                         <select onchange="setProduct(this, ${i})"
                                             class="form-control select2 select-product select-product-${i}"
                                             style="width: 100%;" name="order_details[${i}][product_id]">
@@ -767,11 +772,46 @@
                             }
                         });
                     } else {
-                        Swal.fire(
-                            'Sukses!',
-                            'Berhasil mengubah barang',
-                            'success'
-                        )
+                        const order_id = $(".editOrder").data("id");
+
+                        // console.log($('#orderForm').serialize())
+                        // alert(order_id)
+
+                        $.ajax({
+                            data: $('#orderForm').serialize(),
+                            url: "{{ route('orders.store') }}" + '/' + order_id,
+                            type: "PUT",
+                            dataType: "json",
+                            success: function(data) {
+                                console.log('response data => ', data)
+                                if (data.isError == false) {
+                                    $('#orderForm').trigger("reset");
+                                    $('#ajaxModel').modal('hide');
+
+
+                                    Swal.fire(
+                                        'Sukses!',
+                                        'Berhasil mengubah barang',
+                                        'success'
+                                    )
+
+                                    table.draw();
+                                } else {
+                                    Swal.fire(
+                                        'Gagal!',
+                                        data.message,
+                                        'error'
+                                    )
+                                }
+
+                            },
+                            error: function(data) {
+                                console.log('Error: ', data);
+                                $('#saveBtn').html("Simpan Perubahan");
+                            }
+                        });
+
+
                     }
 
 
@@ -825,50 +865,50 @@
                 Delete Code
                 --------------------------------------------
                 --------------------------------------------*/
-            // $('body').on('click', '.deleteProduct', function() {
+            $('body').on('click', '.deleteOrder', function() {
 
-            //     Swal.fire({
-            //         title: 'Anda yakin ?',
-            //         text: 'Data barang ini akan dihapus jika menekan tombol hapus',
-            //         icon: 'warning',
-            //         showCancelButton: true,
-            //         cancelButtonText: 'Kembali',
-            //         confirmButtonText: 'Hapus',
-            //         confirmButtonColor: "#dc3545",
-            //     }).then((result) => {
-            //         if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Anda yakin ?',
+                    text: 'Data penjualan ini akan dihapus jika menekan tombol hapus',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Kembali',
+                    confirmButtonText: 'Hapus',
+                    confirmButtonColor: "#dc3545",
+                }).then((result) => {
+                    if (result.isConfirmed) {
 
-            //             var order_id = $(this).data("id");
+                        var order_id = $(this).data("id");
 
-            //             $.ajax({
-            //                 type: "DELETE",
-            //                 url: "{{ route('products.store') }}" + '/' + order_id,
-            //                 success: function(data) {
-            //                     if (data.isError == false) {
-            //                         Swal.fire(
-            //                             'Sukses!',
-            //                             data.message,
-            //                             'success'
-            //                         )
-            //                         table.draw();
-            //                     } else {
-            //                         Swal.fire(
-            //                             'Error!',
-            //                             'Ada sesuatu yang salah',
-            //                             'error'
-            //                         )
-            //                         table.draw();
-            //                     }
-            //                 },
-            //                 error: function(data) {
-            //                     console.log('Error: ', data);
-            //                 }
-            //             })
-            //         }
-            //     })
+                        $.ajax({
+                            type: "DELETE",
+                            url: "{{ route('orders.store') }}" + '/' + order_id,
+                            success: function(data) {
+                                if (data.isError == false) {
+                                    Swal.fire(
+                                        'Sukses!',
+                                        data.message,
+                                        'success'
+                                    )
+                                    table.draw();
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        'Ada sesuatu yang salah',
+                                        'error'
+                                    )
+                                    table.draw();
+                                }
+                            },
+                            error: function(data) {
+                                console.log('Error: ', data);
+                            }
+                        })
+                    }
+                })
 
 
-            // })
+            })
         });
     </script>
 @endsection
