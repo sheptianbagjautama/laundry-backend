@@ -20,9 +20,9 @@ class OrderController extends Controller
             return DataTables::of($orders)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Ubah</a>';
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editOrder">Ubah</a>';
 
-                    $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Hapus</a>';
+                    $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteOrder">Hapus</a>';
 
                     return $btn;
                 })
@@ -142,7 +142,8 @@ class OrderController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $order =  Order::with(['sale', 'orderdetails', 'orderdetails.product', 'orderdetails.group'])->find($id);
+        return response()->json($order);
     }
 
     /**

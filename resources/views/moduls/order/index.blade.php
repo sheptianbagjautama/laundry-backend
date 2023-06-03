@@ -113,7 +113,8 @@
                                 <div class="form-group">
                                     <label for="name" class="col-sm-2 control-label">Alamat Pelanggan</label>
                                     <div class="col-sm-12">
-                                        <textarea class="form-control" rows="3" placeholder="Masukan Alamat Pelanggan" name="customer_address"></textarea>
+                                        <textarea class="form-control" rows="3" placeholder="Masukan Alamat Pelanggan" id="customer_address"
+                                            name="customer_address"></textarea>
                                     </div>
                                 </div>
 
@@ -237,7 +238,7 @@
     <script type="text/javascript">
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         var i = 0;
-        // let indexAddEditRowDetail = 0;
+        let indexAddEditRowDetail = 0;
 
         /* Fungsi formatRupiah */
         let formatRupiah = (angka, prefix) => {
@@ -257,43 +258,6 @@
             return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
         }
 
-        // let addRowDetail = (i, type = null) => {
-        //     if (type == "NEW") {
-        //         indexAddEditRowDetail++;
-        //     }
-
-        //     if (type == "EDIT") {
-        //         if (indexAddEditRowDetail == 0) {
-        //             indexAddEditRowDetail = i;
-        //         } else {
-        //             indexAddEditRowDetail++;
-        //         }
-        //     }
-
-        //     $("#dynamicTable").append(`<tr class="tr-body-${indexAddEditRowDetail} table-group-product">
-    //         <td style="width: 30%">
-    //             <input type="hidden" name="group_product[${indexAddEditRowDetail}][id]" value="">
-    //             <select  class="form-control select2 select-groups select-groups-${indexAddEditRowDetail}" style="width: 100%;"
-    //                 name="group_product[${indexAddEditRowDetail}][group_id]">
-    //                 <option value='0'>Pilih Jenis Corak</option>
-    //             </select>
-    //         </td>
-    //         <td>
-    //             <input type="number" name="group_product[${indexAddEditRowDetail}][qty]" placeholder="Masukan Kuantitas"
-    //                 class="form-control">
-
-    //         </td>
-    //         <td>
-    //             <input type="number" name="group_product[${indexAddEditRowDetail}][price]" placeholder="Masukan Harga"
-    //                 class="form-control">
-    //         </td>
-    //         <td>
-    //             <button type="button" class="btn btn-danger remove-tr">Remove</button>
-    //         </td>
-    //     </tr>`)
-
-        //     select2(i);
-        // }
 
         $("#add").click(function() {
             ++i;
@@ -408,6 +372,61 @@
             });
         }
 
+        let addRowDetail = (i, type = null) => {
+            console.log('i => ', i)
+            console.log('type => ', type)
+            if (type == "NEW") {
+                indexAddEditRowDetail++;
+            }
+
+            if (type == "EDIT") {
+                console.log('masuk ke edit')
+                if (indexAddEditRowDetail == 0) {
+                    indexAddEditRowDetail = i;
+                    console.log('0 => ', indexAddEditRowDetail)
+                } else {
+                    indexAddEditRowDetail++;
+                    console.log('++ => ', indexAddEditRowDetail)
+                }
+            }
+
+            $("#dynamicTable").append(`
+                <tr class="tr-body-${indexAddEditRowDetail} table-group-product">
+                    <td style="width: 20%">
+                        <select onchange="setProduct(this, ${indexAddEditRowDetail})"
+                            class="form-control select2 select-product select-product-${indexAddEditRowDetail}"
+                            style="width: 100%;" name="order_details[${indexAddEditRowDetail}][product_id]">
+                            <option value='0'>Pilih Barang</option>
+                        </select>
+                    </td>
+                    <td style="width: 20%">
+                        <select onchange="setPrice(this,${indexAddEditRowDetail})" id="select-group-${indexAddEditRowDetail}"
+                            class="form-control select2 select-group select-group-${indexAddEditRowDetail}"
+                            style="width: 100%;" name="order_details[${indexAddEditRowDetail}][group_id]">
+                            <option value='0'>Pilih Jenis Corak</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" name="order_details[${indexAddEditRowDetail}][price]" id="price-${indexAddEditRowDetail}"
+                            class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="number" onkeyup="setTotal(this,${indexAddEditRowDetail})" name="order_details[${indexAddEditRowDetail}][qty]"
+                            class="form-control" placeholder="Masukan qty barang" id="qty-${indexAddEditRowDetail}">
+                    </td>
+                    <td>
+                        <input type="number" name="order_details[${indexAddEditRowDetail}][total]" id="total-${indexAddEditRowDetail}"
+                            class="form-control" readonly>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-tr">Remove</button>
+                    </td>
+                </tr>
+            `)
+
+            select2Product(indexAddEditRowDetail);
+        }
+
         function setTotal(e, index) {
             console.log('masuk ke set total')
             const price = $(`#price-${index}`).val();
@@ -517,6 +536,59 @@
 
             //BUTTON TAMBAH BARANG
             $('#createNew').click(function() {
+                indexAddEditRowDetail = 0;
+                $('.table-group-product').remove();
+
+                $("#dynamicTable").append(`<tr class="tr-body-${indexAddEditRowDetail} table-group-product">
+                <td style="width: 20%">
+                    <select onchange="setProduct(this, ${indexAddEditRowDetail})"
+                        class="form-control select2 select-product select-product-${indexAddEditRowDetail}"
+                        style="width: 100%;" name="order_details[${indexAddEditRowDetail}][product_id]">
+                        <option value='0'>Pilih Barang</option>
+                    </select>
+                </td>
+                <td style="width: 20%">
+                    <select onchange="setPrice(this,${indexAddEditRowDetail})" id="select-group-${indexAddEditRowDetail}"
+                        class="form-control select2 select-group select-group-${indexAddEditRowDetail}"
+                        style="width: 100%;" name="order_details[${indexAddEditRowDetail}][group_id]">
+                        <option value='0'>Pilih Jenis Corak</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="order_details[${indexAddEditRowDetail}][price]" id="price-${indexAddEditRowDetail}"
+                        class="form-control" readonly>
+                </td>
+                <td>
+                    <input type="number" onkeyup="setTotal(this,${indexAddEditRowDetail})" name="order_details[${indexAddEditRowDetail}][qty]"
+                        class="form-control" placeholder="Masukan qty barang" id="qty-${indexAddEditRowDetail}">
+                </td>
+                <td>
+                    <input type="number" name="order_details[${indexAddEditRowDetail}][total]" id="total-${indexAddEditRowDetail}"
+                        class="form-control" readonly>
+                </td>
+                <td>
+                    <button type="button" onclick=addRowDetail(${indexAddEditRowDetail},'NEW') name="addDetail" id="addDetail"
+                        class="btn btn-primary">Tambah</button>
+                </td>
+            </tr>`);
+
+                select2Product(indexAddEditRowDetail);
+
+
+                //Remove Option Select Type
+                $('#select-sales')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                $('#select-sales').append(
+                    `<option value='' selected>Pilih Sales</option>`);
+
+                //Remove validation class
+                $('.is-invalid').removeClass("is-invalid");
+                $('span.error').remove();
+
+
                 $.ajax({
                     type: "GET",
                     url: "{{ route('orders.code') }}",
@@ -540,84 +612,118 @@
 
             });
 
-            //BUTTON EDIT BARANG
-            // $('body').on('click', '.editProduct', function() {
-            //     indexAddEditRowDetail = 0;
-            //     var order_id = $(this).data('id');
-            //     $.get("{{ route('products.index') }}" + '/' + order_id + '/edit', function(data) {
-            //         $('#modelHeading').html("Mengubah Barang");
-            //         $('#saveBtn').val("edit-product");
-            //         $('#ajaxModel').modal('show');
-            //         $('#order_id').val(data.id);
-            //         $('#name').val(data.name);
-            //         $('#type_id').val(data.type.id);
+            // BUTTON EDIT PENJUALAN
+            $('body').on('click', '.editOrder', function() {
+                indexAddEditRowDetail = 0;
 
-            //         $('#select-types').append(
-            //             `<option value="${data.type.id}" selected>${data.type.name}</option>`);
+                //Remove validation class
+                $('.is-invalid').removeClass("is-invalid");
+                $('span.error').remove();
 
+                var order_id = $(this).data('id');
+                $.get("{{ route('orders.index') }}" + '/' + order_id + '/edit', function(data) {
+                    $('#modelHeading').html("Mengubah Penjualan");
+                    $('#saveBtn').val("edit-order");
+                    $('#ajaxModel').modal('show');
 
-            //         let i = 0;
-            //         $('.table-group-product').remove();
+                    $('#order_id').val(data.id);
+                    $('#code').val(data.code);
+                    $('#select-sales').val(data.sale_id);
+                    $('#customer_name').val(data.customer_name);
+                    $('#customer_phone').val(data.customer_phone);
+                    $('#customer_address').val(data.customer_address);
 
-
-            //         data.groups.forEach(detail => {
-            //             if (i == 0) {
-            //                 $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
-
-        //                             <td style="width: 30%">
-        //                                 <input type="hidden" name="group_product[${i}][id]" value=${detail.pivot.id}>
-        //                                 <select  class="form-control select2 select-groups select-groups-${i}" style="width: 100%;"
-        //                                     name="group_product[${i}][group_id]">
-        //                                     <option value='${detail.id}' selected>${detail.name}</option>
-        //                                 </select>
-        //                             </td>
-        //                             <td>
-        //                                 <input type="number" name="group_product[${i}][qty]" value=${detail.pivot.qty} placeholder="Masukan Kuantitas"
-        //                                     class="form-control">
-
-        //                             </td>
-        //                             <td>
-        //                                 <input type="number" name="group_product[${i}][price]" value=${detail.pivot.price} placeholder="Masukan Harga"
-        //                                     class="form-control">
-        //                             </td>
-        //                             <td>
-        //                                 <button type="button" onclick=addRowDetail(${data.groups.length},'EDIT') name="addEdit" id="addEdit"
-        //                                     class="btn btn-primary">Tambah Lagi</button>
-        //                             </td>
-        //                         </tr>`)
-
-            //             } else {
-            //                 $("#dynamicTable").append(`<tr class="tr-body-${i} table-group-product">
-
-        //                             <td style="width: 30%">
-        //                                 <input type="hidden" name="group_product[${i}][id]" value=${detail.pivot.id}>
-        //                                 <select  class="form-control select2 select-groups select-groups-${i}" style="width: 100%;"
-        //                                     name="group_product[${i}][group_id]">
-        //                                     <option value='${detail.id}' selected>${detail.name}</option>
-        //                                 </select>
-        //                             </td>
-        //                             <td>
-        //                                 <input type="number" name="group_product[${i}][qty]" value=${detail.pivot.qty} placeholder="Masukan Kuantitas"
-        //                                     class="form-control">
-
-        //                             </td>
-        //                             <td>
-        //                                 <input type="number" name="group_product[${i}][price]" value=${detail.pivot.price} placeholder="Masukan Harga"
-        //                                     class="form-control">
-        //                             </td>
-        //                             <td>
-        //                                 <button type="button" class="btn btn-danger remove-tr">Remove</button>
-        //                             </td>
-        //                         </tr>`)
-            //             }
+                    $('#select-sales').append(
+                        `<option value="${data.sale_id}" selected>${data.sale.name}</option>`);
 
 
-            //             select2(i);
-            //             i++;
-            //         });
+                    let i = 0;
+                    $('.table-group-product').remove();
 
-            //     })
-            // });
+                    console.log(data);
+
+                    data.orderdetails.forEach(detail => {
+                        console.log('detail => ', detail)
+                    });
+
+                    data.orderdetails.forEach(detail => {
+                        if (i == 0) {
+                            $("#dynamicTable").append(`
+                                <tr class="tr-body-${i} table-group-product">
+                                    <td style="width: 20%">
+                                        <select onchange="setProduct(this, ${i})"
+                                            class="form-control select2 select-product select-product-${i}"
+                                            style="width: 100%;" name="order_details[${i}][product_id]">
+                                            <option value=${detail.product.id}>${detail.product.name}</option>
+                                        </select>
+                                    </td>
+                                    <td style="width: 20%">
+                                        <select onchange="setPrice(this,${i})" id="select-group-${i}"
+                                            class="form-control select2 select-group select-group-${i}"
+                                            style="width: 100%;" name="order_details[${i}][group_id]">
+                                            <option value=${detail.group.id}>${detail.group.name}</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="order_details[${i}][price]" id="price-${i}"
+                                            class="form-control" value=${detail.price} readonly>
+                                    </td>
+                                    <td>
+                                        <input type="number" onkeyup="setTotal(this,${i})" name="order_details[${i}][qty]"
+                                            class="form-control" placeholder="Masukan qty barang" id="qty-${i}" value=${detail.qty}>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="order_details[${i}][total]" id="total-${i}"
+                                            class="form-control" value=${detail.total} readonly>
+                                    </td>
+                                    <td>
+                                        <button type="button" name="addEdit" id="addEdit" onclick="addRowDetail(${data.orderdetails.length},'EDIT')"
+                                        class="btn btn-primary">Tambah</button>
+                                    </td>
+                                </tr>
+                        `);
+                        } else {
+                            $("#dynamicTable").append(`
+                                <tr class="tr-body-${i} table-group-product">
+                                    <td style="width: 20%">
+                                        <select onchange="setProduct(this, ${i})"
+                                            class="form-control select2 select-product select-product-${i}"
+                                            style="width: 100%;" name="order_details[${i}][product_id]">
+                                            <option value=${detail.product.id}>${detail.product.name}</option>
+                                        </select>
+                                    </td>
+                                    <td style="width: 20%">
+                                        <select onchange="setPrice(this,${i})" id="select-group-${i}"
+                                            class="form-control select2 select-group select-group-${i}"
+                                            style="width: 100%;" name="order_details[${i}][group_id]">
+                                            <option value=${detail.group.id}>${detail.group.name}</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="order_details[${i}][price]" id="price-${i}"
+                                            class="form-control" value=${detail.price} readonly>
+                                    </td>
+                                    <td>
+                                        <input type="number" onkeyup="setTotal(this,${i})" name="order_details[${i}][qty]"
+                                            class="form-control" placeholder="Masukan qty barang" id="qty-${i}" value=${detail.qty}>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="order_details[${i}][total]" id="total-${i}"
+                                            class="form-control" value=${detail.total} readonly>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-tr">Remove</button>
+                                    </td>
+                                </tr>
+                        `);
+                        }
+
+                        select2Product(i);
+                        i++;
+                    });
+
+                })
+            });
 
 
             //BUAT ATAU UBAH BARANG

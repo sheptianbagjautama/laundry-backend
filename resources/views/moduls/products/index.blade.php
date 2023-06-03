@@ -216,15 +216,19 @@
         }
 
         let addRowDetail = (i, type = null) => {
+            console.log('i => ', i)
+            console.log('type => ', type)
             if (type == "NEW") {
                 indexAddEditRowDetail++;
             }
 
             if (type == "EDIT") {
                 if (indexAddEditRowDetail == 0) {
+                    console.log('0 => ', indexAddEditRowDetail)
                     indexAddEditRowDetail = i;
                 } else {
                     indexAddEditRowDetail++;
+                    console.log('++ => ', indexAddEditRowDetail)
                 }
             }
 
