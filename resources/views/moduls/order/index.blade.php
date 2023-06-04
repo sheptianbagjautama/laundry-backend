@@ -618,6 +618,7 @@
             // BUTTON EDIT PENJUALAN
             $('body').on('click', '.editOrder', function() {
                 indexAddEditRowDetail = 0;
+                let i = 0;
 
                 //Remove validation class
                 $('.is-invalid').removeClass("is-invalid");
@@ -640,7 +641,7 @@
                         `<option value="${data.sale_id}" selected>${data.sale.name}</option>`);
 
 
-                    let i = 0;
+
                     $('.table-group-product').remove();
 
                     console.log(data);
@@ -650,11 +651,13 @@
                     });
 
                     data.orderdetails.forEach(detail => {
+                        console.log('orderdetials edit => ', detail)
+                        console.log('i ==>', i)
                         if (i == 0) {
                             $("#dynamicTable").append(`
                                 <tr class="tr-body-${i} table-group-product">
                                     <td style="width: 20%">
-                                        <input type="hidden" name="order_details[${indexAddEditRowDetail}][id]" value=${detail.id}>
+                                        <input type="hidden" name="order_details[${i}][id]" value=${detail.id}>
                                         <select onchange="setProduct(this, ${i})"
                                             class="form-control select2 select-product select-product-${i}"
                                             style="width: 100%;" name="order_details[${i}][product_id]">
@@ -690,7 +693,7 @@
                             $("#dynamicTable").append(`
                                 <tr class="tr-body-${i} table-group-product">
                                     <td style="width: 20%">
-                                        <input type="hidden" name="order_details[${indexAddEditRowDetail}][id]" value=${detail.id}>
+                                        <input type="hidden" name="order_details[${i}][id]" value=${detail.id}>
                                         <select onchange="setProduct(this, ${i})"
                                             class="form-control select2 select-product select-product-${i}"
                                             style="width: 100%;" name="order_details[${i}][product_id]">
@@ -735,6 +738,7 @@
             $.validator.setDefaults({
                 submitHandler: function() {
                     let isCreate = $('#orderForm').serialize();
+
 
                     if (isCreate.includes('order_id=&')) {
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GroupProduct;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
@@ -14,7 +15,6 @@ class OrderController extends Controller
     public function getOrder(Request $request)
     {
         if ($request->ajax()) {
-            // $orders = Order::with(['sale', 'orderdetails'])->latest()->get();
             $orders = Order::latest()->get();
 
             return DataTables::of($orders)
@@ -35,10 +35,6 @@ class OrderController extends Controller
      */
     public function index()
     {
-        // $orders = Order::with(['sale', 'orderdetails'])->latest()->get();
-        // $orders = Order::with(['sale'])->latest()->get();
-        // return response()->json($orders);
-
         $title = 'Penjualan';
         $subtitle = 'Halaman Penjualan';
         return view('moduls.order.index', [
@@ -61,6 +57,13 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $order_details = $request->order_details;
+        // $details = array();
+
+        // foreach ($order_details as $key => $od) {
+        //     if(in_array($od['']))
+        // }
+
+
 
         if (count($order_details) < 1) {
             return response()->json([
@@ -114,6 +117,12 @@ class OrderController extends Controller
             $od['order_id'] = $order->id;
             $od['code'] = $this->generateCode();
             OrderDetail::create($od);
+
+            $product = GroupProduct::where('product_id', $od['product_id'])->where('group_id', $od['group_id'])->first();
+            $product->qty -= $od['qty'];
+            $product->save();
+
+
             $total_price += $od['total'];
             $qty += $od['qty'];
         }
@@ -151,12 +160,6 @@ class OrderController extends Controller
      */
     public function update(Request $request)
     {
-        // return response()->json([
-        //     'isError' => false,
-        //     'data' => $request->all(),
-        //     'message' => 'Berhasil mengubah penjualan'
-        // ]);
-
         $order_details = $request->order_details;
 
         if (count($order_details) < 1) {
@@ -207,26 +210,35 @@ class OrderController extends Controller
         $total_price = 0;
         $total_qty = 0;
 
-        // return response()->json([
-        //     'isError' => false,
-        //     'data' => $order_details,
-        //     'message' => 'Berhasil mengubah penjualan'
-        // ]);
-
         foreach ($order_details as $key => $od) {
-            if ($od['id'] != null) {
+            if (array_key_exists('id', $od) && $od['id'] != null) {
                 $orderDetail = OrderDetail::findOrFail($od['id']);
+
+                //POTONG QTY
+                $product = GroupProduct::where('product_id', $od['product_id'])->where('group_id', $od['group_id'])->first();
+                $product->qty += $orderDetail->qty;
+                $product->save();
+
                 $orderDetail->update($od);
+
+                //TAMBAH QTY DATA SEBELUMNYA
+                $product = GroupProduct::where('product_id', $od['product_id'])->where('group_id', $od['group_id'])->first();
+                $product->qty -= $od['qty'];
+                $product->save();
             } else {
                 $od['order_id'] = $order->id;
                 $od['code'] = $this->generateCode();
                 OrderDetail::create($od);
+
+                //POTONG QTY
+                $product = GroupProduct::where('product_id', $od['product_id'])->where('group_id', $od['group_id'])->first();
+                $product->qty -= $od['qty'];
+                $product->save();
             }
             $total_price += $od['total'];
             $total_qty += $od['qty'];
         }
 
-        // $order_update = Order::findOrFail($request->order_id);
         $order->total_price = $total_price;
         $order->total_qty = $total_qty;
         $order->save();
@@ -247,6 +259,11 @@ class OrderController extends Controller
 
         foreach ($order->orderdetails as $key => $od) {
             $order_detail = OrderDetail::findOrFail($od['id']);
+
+            $product = GroupProduct::where('product_id', $od['product_id'])->where('group_id', $od['group_id'])->first();
+            $product->qty += $order_detail->qty;
+            $product->save();
+
             $order_detail->delete();
         }
 
@@ -267,36 +284,10 @@ class OrderController extends Controller
         ]);
     }
 
-    public function testing()
-    {
-        return 'Whyyy';
-    }
-
     private function generateCode()
     {
         $code = DB::select('SELECT IFNULL(MAX(id),0) + 1 AS nextCode FROM order_details');
         $result = "ORDT-00" . $code[0]->nextCode;
         return $result;
     }
-
-    // public function generateUniqueCode()
-    // {
-    //     $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    //     $charactersNumber = strlen($characters);
-    //     $codeLength = 6;
-
-    //     $code = '';
-
-    //     while (strlen($code) < 6) {
-    //         $position = rand(0, $charactersNumber - 1);
-    //         $character = $characters[$position];
-    //         $code = $code . $character;
-    //     }
-
-    //     if (Order::where('code', $code)->exists()) {
-    //         $this->generateUniqueCode();
-    //     }
-
-    //     return $code;
-    // }
 }
