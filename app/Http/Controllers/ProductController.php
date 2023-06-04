@@ -6,9 +6,16 @@ use App\Models\GroupProduct;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
+    public function authSession()
+    {
+        $user = Auth::user();
+        return $user;
+    }
+
     public function getProducts(Request $request)
     {
         if ($request->ajax()) {
@@ -43,29 +50,10 @@ class ProductController extends Controller
      */
     public function index()
     {
-        // $products = Product::with(['type', 'groups'])->latest()->get();
-
-
-        // foreach ($products as $key => $product) {
-        //     $stocks = '';
-        //     foreach ($product['groups'] as $key => $gp) {
-        //         $stocks = $stocks . 'Stok : ' . $gp['name'] . ' = ' . $gp['pivot']['qty'] . ' pcs, Harga = ' . $gp['pivot']['price'] . '<br>';
-        //     }
-        //     $product['stocks'] = $stocks;
-        // }
-
-
-
-        // return response()->json([
-        //     // 'data' => $datas,
-        //     'data' => $products,
-
-        // ]);
-
-
         $title = 'Barang';
         $subtitle = 'Halaman Barang';
         return view('moduls.products.index', [
+            'user' => $this->authSession(),
             'title' => $title,
             'subtitle' => $subtitle
         ]);

@@ -7,10 +7,16 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function authSession()
+    {
+        $user = Auth::user();
+        return $user;
+    }
 
     public function getOrder(Request $request)
     {
@@ -38,6 +44,7 @@ class OrderController extends Controller
         $title = 'Penjualan';
         $subtitle = 'Halaman Penjualan';
         return view('moduls.order.index', [
+            'user' => $this->authSession(),
             'title' => $title,
             'subtitle' => $subtitle
         ]);
@@ -57,13 +64,6 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $order_details = $request->order_details;
-        // $details = array();
-
-        // foreach ($order_details as $key => $od) {
-        //     if(in_array($od['']))
-        // }
-
-
 
         if (count($order_details) < 1) {
             return response()->json([

@@ -5,10 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function authSession()
+    {
+        $user = Auth::user();
+        return $user;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -18,6 +24,7 @@ class UserController extends Controller
         $title = 'Akun Pengguna';
         $subtitle = 'Halaman Akun Pengguna';
         return view('moduls.user.index', [
+            'user' => $this->authSession(),
             'title' => $title,
             'subtitle' => $subtitle
         ]);

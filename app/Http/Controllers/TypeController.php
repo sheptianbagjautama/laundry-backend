@@ -6,9 +6,16 @@ use App\Models\Type;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class TypeController extends Controller
 {
+
+    public function authSession()
+    {
+        $user = Auth::user();
+        return $user;
+    }
 
     public function getTypes(Request $request)
     {
@@ -36,6 +43,7 @@ class TypeController extends Controller
         $title = 'Tipe';
         $subtitle = 'Halaman Tipe';
         return view('moduls.type.index', [
+            'user' => $this->authSession(),
             'title' => $title,
             'subtitle' => $subtitle
         ]);

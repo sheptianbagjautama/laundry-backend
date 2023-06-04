@@ -6,9 +6,16 @@ use App\Models\GroupProduct;
 use App\Models\ItemReceive;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class ItemReceiveController extends Controller
 {
+    public function authSession()
+    {
+        $user = Auth::user();
+        return $user;
+    }
+
     public function getItemReceive(Request $request)
     {
         if ($request->ajax()) {
@@ -32,6 +39,7 @@ class ItemReceiveController extends Controller
         $title = 'Penerimaan Barang';
         $subtitle = 'Halaman Penerimaan Barang';
         return view('moduls.itemreceives.index', [
+            'user' => $this->authSession(),
             'title' => $title,
             'subtitle' => $subtitle
         ]);

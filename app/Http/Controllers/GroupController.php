@@ -7,10 +7,16 @@ use App\Models\GroupProduct;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class GroupController extends Controller
 {
+    public function authSession()
+    {
+        $user = Auth::user();
+        return $user;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -19,6 +25,7 @@ class GroupController extends Controller
         $title = 'Grup';
         $subtitle = 'Halaman Grup';
         return view('moduls.group.index', [
+            'user' => $this->authSession(),
             'title' => $title,
             'subtitle' => $subtitle
         ]);
@@ -51,6 +58,7 @@ class GroupController extends Controller
         $subtitle = 'Form Buat Grup';
 
         return view('moduls.group.create', [
+            'user' => $this->authSession(),
             'title' => $title,
             'subtitle' => $subtitle
         ]);

@@ -5,9 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Sales;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class SalesController extends Controller
 {
+    public function authSession()
+    {
+        $user = Auth::user();
+        return $user;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -16,6 +22,7 @@ class SalesController extends Controller
         $title = 'Sales';
         $subtitle = 'Halaman Sales';
         return view('moduls.sales.index', [
+            'user' => $this->authSession(),
             'title' => $title,
             'subtitle' => $subtitle
         ]);
